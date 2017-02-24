@@ -2,10 +2,10 @@
 
 An Android Application that allows users to convert U.S. Dollars (USD) to Foreign Currency. 
 
-Currently supports conversion to Japan Yen (JPY), Great Britain Pounds, Euros (EUR) and Brazil Reais (BRL).
+Currently supports conversion to Japan Yen (JPY), Great Britain Pounds (GBP), Euros (EUR) and Brazil Reais (BRL).
 Conversion accurate as of January 30th 2017. Up to Date conversions to be implemented via api calls
 
-## Built With – Android Studio & Android SDK
+## Built With â€“ Android Studio & Android SDK
 
 - Frontend
   - XML
