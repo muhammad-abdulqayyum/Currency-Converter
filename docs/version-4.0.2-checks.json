@@ -1,0 +1,22 @@
+{
+  "version": "4.0.2",
+  "versionCode": 42,
+  "apkBytes": 104254,
+  "sha256": "8c2203e3c94463647b2d1d5b4a7310bb09bd05d2ada66928b736452b46adcee0",
+  "signerSha256": "648d41550ab8f7b9b34618551fd3002199f0e2bc1bb4d792d4f20712d2f85c93",
+  "unitTests": 36,
+  "unitFailures": 0,
+  "lintErrors": 0,
+  "sourceBuildWorkflow": 40945182491,
+  "deviceApi": 23,
+  "deviceWorkflowRun": 40945780933,
+  "deviceChecks": "passed",
+  "oneScreenDefault": "420x900",
+  "largeTextFooterAbout": "passed",
+  "largeTextScale": 1.3,
+  "largeLayout": "360x800",
+  "upgradeFrom4_0_1": "passed",
+  "swapTouchTargetDp": 48,
+  "swapVisibleDiameterDp": 30,
+  "swapCentered": "passed"
+}

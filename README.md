@@ -1,12 +1,14 @@
-# Universal Currency Converter · Version 4.0.1
+# Universal Currency Converter · Version 4.0.2
 
 By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
-**[Download Version 4.0.1](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.1.apk)** · Android 6.0+ · debug-signed preview.
+**[Download Version 4.0.2](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.2.apk)** · Android 6.0+ · debug-signed preview.
 
-## Version 4.0.1
+## Version 4.0.2
 
-The default screen uses a compact header, Swap beside From, and a footer with the heritage flag on the left, the full author credit beside it, and About on the right. Spare vertical space places the footer at the bottom. Narrow screens or larger text move About below the credit and allow natural scrolling.
+The default screen uses a compact header, a compact circular Swap centered between From and To, and a footer with the heritage flag on the left, the full author credit beside it, and About on the right. Spare vertical space places the footer at the bottom. Narrow screens or larger text move About below the credit and allow natural scrolling.
+
+The visible swap circle is 30 dp with crisp horizontal arrows; its accessible touch target is 48 × 48 dp. The cream/navy colors, serif typography and heritage footer are retained.
 
 ## Version 4 features
 
@@ -38,7 +40,7 @@ HTTPS certificate validation, connection/read timeouts, response size limits and
 
 ## Install and build
 
-Version 4.0.1 uses version code 41 and the same preview signing certificate as 4.0, allowing an in-place update. Older 3.x previews used a different certificate and may require uninstalling once. The preview key is backed up privately for future updates. Production publishing needs a separately prepared release and private signing/upload key; never commit private keys.
+Version 4.0.2 uses version code 42 and the same preview signing certificate as 4.0 and 4.0.1, allowing an in-place update. Older 3.x previews used a different certificate and may require uninstalling once. The preview key is backed up privately for future updates. Production publishing needs a separately prepared release and private signing/upload key; never commit private keys.
 
 [Version 4.0](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.apk) · [Version 4.0 history](docs/version-4.0-history.md)
 
@@ -51,15 +53,15 @@ gradle -p project testDebugUnitTest lintDebug assembleDebug
 python3 scripts/validate_rates.py
 ```
 
-Minimum Android 6.0/API 23; compile/target SDK 35. Play publishing needs a production build and review of current store requirements. See [4.0.1 layout validation](docs/version-4.0.1-validation.md) and [Version 4 conversion validation](docs/version-4-validation.md).
+Minimum Android 6.0/API 23; compile/target SDK 35. Play publishing needs a production build and review of current store requirements. See [4.0.2 layout validation](docs/version-4.0.2-validation.md) and [Version 4 conversion validation](docs/version-4-validation.md).
 
 ## Preview
 
-![Version 4 main screen](docs/screenshots/v401-home.png)
+![Version 4 main screen](docs/screenshots/v402-home.png)
 
-![Metals picker](docs/screenshots/v401-metals-picker.png)
+![Metals picker](docs/screenshots/v402-metals-picker.png)
 
-[Larger text and the responsive footer](docs/screenshots/v401-large-footer.png)
+[Larger text and the responsive footer](docs/screenshots/v402-large-footer.png)
 
 ## About
 
