@@ -29,6 +29,14 @@ def check_fit():
  rb,ab,fb=bounds(root),bounds(about),bounds(flag)
  assert ab[3]-ab[1]>=48 and rb[3]-ab[3]>=8,(rb,ab)
  assert fb[3]-fb[1]>=35 and fb[2]-fb[0]>=52,fb
+ swap=next(n for n in nodes if n.get('resource-id','').endswith('/swap'))
+ source=next(n for n in nodes if n.get('resource-id','').endswith('/from_asset'))
+ target=next(n for n in nodes if n.get('resource-id','').endswith('/to_asset'))
+ sb,src,dst=bounds(swap),bounds(source),bounds(target)
+ assert sb[2]-sb[0]>=48 and sb[3]-sb[1]>=48,sb
+ assert abs((sb[0]+sb[2])-(src[0]+src[2]))<=2,(sb,src)
+ assert src[3]<=sb[1] and sb[3]<=dst[1],(src,sb,dst)
+ print('PASS: centered 48 dp swap target between cards',flush=True)
  print('PASS: one-screen default layout '+str(rb),flush=True)
 def shot(name):
  (OUT/(name+'.png')).write_bytes(adb('exec-out','screencap','-p'))
@@ -48,9 +56,9 @@ def launch():
  adb('shell','am','force-stop',PKG);adb('shell','am','start','-W','-n',PKG+'/.MainActivity');time.sleep(1)
 serial=adb('get-serialno').decode().strip()
 assert serial.startswith('emulator-'),'Use a dedicated emulator only'
-adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.apk'))
 adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.1.apk'))
-print('PASS: upgrade 4.0 to 4.0.1',flush=True)
+adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.2.apk'))
+print('PASS: upgrade 4.0.1 to 4.0.2',flush=True)
 adb('shell','wm','size','420x900');adb('shell','wm','density','160');adb('shell','input','keyevent','82');adb('logcat','-c')
 now=int(time.time()*1000);day=datetime.datetime.now(datetime.timezone.utc).date();prefs=['<map>']
 for code,rate in {'GBP':'0.8','BRL':'5','PHP':'60','XAU':'0.00025','XAG':'0.025','BTC':'0.00001'}.items():
@@ -67,8 +75,8 @@ try:
  choose('to_asset','metals_tab','Silver');check('250,000 troy oz of Silver')
  choose('from_asset','world_tab','Brazilian Real','BRL');choose('to_asset','world_tab','Philippine Peso','PHP');check('1,200.00 PHP')
  choose('from_asset','metals_tab','Palladium');choose('to_asset','metals_tab','Palladium');check('100 troy oz of Palladium')
- launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0.1' in ui();adb('shell','input','keyevent','4')
- adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0.1' in ui();adb('shell','input','keyevent','4')
+ launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0.2' in ui();adb('shell','input','keyevent','4')
+ adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0.2' in ui();adb('shell','input','keyevent','4')
  logs=adb('logcat','-d');(OUT/'logcat.txt').write_bytes(logs);assert b'FATAL EXCEPTION' not in logs
  print('ALL DEVICE CHECKS PASSED',flush=True)
  for name in ['home','metals-picker','crypto-picker','footer','large-picker','large-footer']:

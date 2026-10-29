@@ -3,7 +3,7 @@ on:
   push:
     branches: [version-4]
     paths:
-      - 'android-installer-file/Currency-Converter-4.0.apk'
+      - 'android-installer-file/Currency-Converter-4.0.2.apk'
       - 'android-installer-file/Currency-Converter-4.0.1.apk'
       - 'scripts/android_smoke.py'
       - '.github/workflows/device-check.yml'
