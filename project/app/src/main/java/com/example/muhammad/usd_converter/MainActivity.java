@@ -48,30 +48,44 @@ public class MainActivity extends Activity {
     private void add(LinearLayout parent,View v,int gap){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(gap);parent.addView(v,p);}
     private void buildScreen(String initial){
         ScrollView scroll=new ScrollView(this);scroll.setId(R.id.activity_main);scroll.setFillViewport(true);scroll.setBackgroundColor(CREAM);
-        LinearLayout body=column();body.setPadding(dp(24),dp(20),dp(24),dp(32));body.setFocusableInTouchMode(true);scroll.addView(body);setContentView(scroll);
+        LinearLayout body=column();body.setPadding(dp(20),dp(12),dp(20),dp(12));body.setFocusableInTouchMode(true);scroll.addView(body);setContentView(scroll);
         scroll.setOnApplyWindowInsetsListener((v,i)->{v.setPadding(i.getSystemWindowInsetLeft(),i.getSystemWindowInsetTop(),i.getSystemWindowInsetRight(),i.getSystemWindowInsetBottom());return i;});scroll.requestApplyInsets();
-        LinearLayout brand=new LinearLayout(this);brand.setGravity(Gravity.CENTER_VERTICAL);ImageView logo=new ImageView(this);logo.setImageResource(R.drawable.universal_emblem);logo.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);brand.addView(logo,new LinearLayout.LayoutParams(dp(48),dp(48)));
-        TextView name=text(getString(R.string.brand),12,NAVY);name.setTypeface(null,Typeface.BOLD);name.setPadding(dp(12),0,0,0);brand.addView(name);add(body,brand,0);
-        TextView version=text("VERSION 4 · FOR HUMANITY",11,0xff9b2637);version.setLetterSpacing(.08f);version.setTypeface(null,Typeface.BOLD);add(body,version,20);
-        add(body,heading("A world within reach.",28),6);add(body,text("World currencies, metals and crypto.",14,MUTED),6);
-        LinearLayout card=column();card.setPadding(dp(16),dp(12),dp(16),dp(12));card.setBackground(surface(0xfffffdfa));add(body,card,20);
+        LinearLayout brand=new LinearLayout(this);brand.setGravity(Gravity.CENTER_VERTICAL);ImageView logo=new ImageView(this);logo.setImageResource(R.drawable.universal_emblem);logo.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);brand.addView(logo,new LinearLayout.LayoutParams(dp(44),dp(44)));
+        LinearLayout brandCopy=column();brandCopy.setPadding(dp(12),0,0,0);brand.addView(brandCopy,new LinearLayout.LayoutParams(0,-2,1));
+        TextView name=text(getString(R.string.brand),12,NAVY);name.setTypeface(null,Typeface.BOLD);add(brandCopy,name,0);
+        TextView version=text("VERSION 4 · FOR HUMANITY",10,0xff9b2637);version.setLetterSpacing(.06f);version.setTypeface(null,Typeface.BOLD);add(brandCopy,version,2);add(body,brand,0);
+        add(body,heading("A world within reach.",26),12);add(body,text("World currencies, metals and crypto.",13,MUTED),4);
+        LinearLayout card=column();card.setPadding(dp(14),dp(10),dp(14),dp(10));card.setBackground(surface(0xfffffdfa));add(body,card,14);
         TextView label=text("Amount",13,MUTED);label.setLabelFor(R.id.editText);add(card,label,0);
-        amount=new EditText(this);amount.setId(R.id.editText);amount.setInputType(8194);amount.setSingleLine(true);amount.setTextSize(28);amount.setTextColor(NAVY);amount.setMinHeight(dp(56));amount.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(22)});amount.setText(initial);add(card,amount,0);
+        amount=new EditText(this);amount.setId(R.id.editText);amount.setInputType(8194);amount.setSingleLine(true);amount.setTextSize(27);amount.setTextColor(NAVY);amount.setMinHeight(dp(48));amount.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(22)});amount.setText(initial);add(card,amount,0);
         unit=text("",12,MUTED);add(card,unit,2);
-        add(body,text("From",13,MUTED),18);fromButton=column();fromButton.setId(R.id.from_asset);add(body,fromButton,6);
-        swap=new Button(this);swap.setId(R.id.swap);swap.setText("⇅  Swap");swap.setTextSize(14);swap.setTextColor(GREEN);swap.setAllCaps(false);swap.setBackground(surface(CREAM));swap.setContentDescription("Swap source and destination; keep the entered amount");LinearLayout.LayoutParams sp=new LinearLayout.LayoutParams(dp(112),dp(48));sp.gravity=Gravity.CENTER_HORIZONTAL;sp.topMargin=dp(8);body.addView(swap,sp);
-        add(body,text("To",13,MUTED),0);toButton=column();toButton.setId(R.id.to_asset);add(body,toButton,6);
-        note=text("",12,MUTED);add(body,note,10);
-        convert=new Button(this);convert.setId(R.id.convert);convert.setText("Convert");convert.setAllCaps(false);convert.setTextColor(0xffffffff);convert.setTextSize(17);convert.setMinHeight(dp(56));convert.setBackground(surface(NAVY));add(body,convert,16);
+        LinearLayout pairHeading=new LinearLayout(this);pairHeading.setGravity(Gravity.CENTER_VERTICAL);add(body,pairHeading,8);
+        TextView fromLabel=text("From",13,MUTED);pairHeading.addView(fromLabel,new LinearLayout.LayoutParams(0,-2,1));
+        swap=new Button(this);swap.setId(R.id.swap);swap.setText("⇅  Swap");swap.setTextSize(13);swap.setTextColor(GREEN);swap.setAllCaps(false);swap.setBackground(surface(CREAM));swap.setContentDescription("Swap source and destination; keep the entered amount");pairHeading.addView(swap,new LinearLayout.LayoutParams(dp(104),dp(48)));
+        fromButton=column();fromButton.setId(R.id.from_asset);add(body,fromButton,0);
+        add(body,text("To",13,MUTED),10);toButton=column();toButton.setId(R.id.to_asset);add(body,toButton,4);
+        note=text("",12,MUTED);add(body,note,8);
+        convert=new Button(this);convert.setId(R.id.convert);convert.setText("Convert");convert.setAllCaps(false);convert.setTextColor(0xffffffff);convert.setTextSize(17);convert.setMinHeight(dp(52));convert.setBackground(surface(NAVY));add(body,convert,12);
         progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);progress.setIndeterminate(true);progress.setVisibility(View.GONE);add(body,progress,4);
-        LinearLayout resultCard=column();resultCard.setPadding(dp(18),dp(16),dp(18),dp(16));resultCard.setBackground(surface(0xffeef2e9));add(body,resultCard,18);
+        LinearLayout resultCard=column();resultCard.setPadding(dp(16),dp(12),dp(16),dp(12));resultCard.setBackground(surface(0xffeef2e9));add(body,resultCard,14);
         resultLabel=text("YOUR CONVERSION",11,GREEN);resultLabel.setId(R.id.result_label);add(resultCard,resultLabel,0);
-        result=heading("Ready to convert",25);result.setId(R.id.result);result.setTextIsSelectable(true);result.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);add(resultCard,result,8);
-        status=text("",12,MUTED);status.setId(R.id.status);status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);add(resultCard,status,10);
-        LinearLayout footer=column();footer.setGravity(Gravity.CENTER_HORIZONTAL);footer.setPadding(0,dp(24),0,dp(12));add(body,footer,0);
-        ImageView flag=new ImageView(this);flag.setImageResource(R.drawable.heritage_flag);flag.setContentDescription(getString(R.string.heritage_flag_description));footer.addView(flag,new LinearLayout.LayoutParams(dp(72),dp(48)));
-        TextView credit=text(getString(R.string.footer),12,MUTED);credit.setGravity(Gravity.CENTER);credit.setLineSpacing(dp(4),1);add(footer,credit,10);
-        Button about=new Button(this,null,android.R.attr.borderlessButtonStyle);about.setId(R.id.about);about.setText("About & sources");about.setAllCaps(false);about.setTextColor(GREEN);about.setMinHeight(dp(48));add(footer,about,4);about.setOnClickListener(v->new AlertDialog.Builder(this).setTitle(R.string.app_name).setMessage(R.string.about_text).setPositiveButton(android.R.string.ok,null).show());
+        result=heading("Ready to convert",23);result.setId(R.id.result);result.setTextIsSelectable(true);result.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);add(resultCard,result,6);
+        status=text("",12,MUTED);status.setId(R.id.status);status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);add(resultCard,status,6);
+        // Fill spare height on roomy screens; stay naturally scrollable when content grows.
+        body.addView(new View(this),new LinearLayout.LayoutParams(1,0,1));
+        View divider=new View(this);divider.setBackgroundColor(0xffd9ddd8);LinearLayout.LayoutParams line=new LinearLayout.LayoutParams(-1,dp(1));line.topMargin=dp(16);body.addView(divider,line);
+        LinearLayout footer=column();footer.setPadding(0,dp(10),0,0);add(body,footer,0);
+        LinearLayout creditRow=new LinearLayout(this);creditRow.setGravity(Gravity.CENTER_VERTICAL);add(footer,creditRow,0);
+        ImageView flag=new ImageView(this);flag.setImageResource(R.drawable.heritage_flag);flag.setContentDescription(getString(R.string.heritage_flag_description));creditRow.addView(flag,new LinearLayout.LayoutParams(dp(52),dp(35)));
+        View rule=new View(this);rule.setBackgroundColor(0xffb9c1c7);LinearLayout.LayoutParams ruleParams=new LinearLayout.LayoutParams(dp(1),dp(32));ruleParams.setMargins(dp(12),0,dp(12),0);creditRow.addView(rule,ruleParams);
+        String creditText="Built for humanity, with care.\nMuhammad Hafiz Abdul-Qayyum";
+        android.text.SpannableString styled=new android.text.SpannableString(creditText);int split=creditText.indexOf('\n');
+        styled.setSpan(new android.text.style.StyleSpan(Typeface.BOLD),0,split,0);styled.setSpan(new android.text.style.ForegroundColorSpan(MUTED),split+1,creditText.length(),0);styled.setSpan(new android.text.style.RelativeSizeSpan(.92f),split+1,creditText.length(),0);
+        TextView credit=text("",12,NAVY);credit.setText(styled);credit.setLineSpacing(dp(2),1);creditRow.addView(credit,new LinearLayout.LayoutParams(0,-2,1));
+        Button about=new Button(this,null,android.R.attr.borderlessButtonStyle);about.setId(R.id.about);about.setText("About & sources");about.setAllCaps(false);about.setTextColor(GREEN);about.setTextSize(12);about.setPadding(dp(4),0,dp(4),0);about.setMinWidth(0);about.setMinHeight(dp(48));
+        boolean roomy=getResources().getConfiguration().screenWidthDp>=400 && getResources().getConfiguration().fontScale<=1.15f;
+        if(roomy)creditRow.addView(about,new LinearLayout.LayoutParams(dp(96),-2));else{LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-2,-2);ap.gravity=Gravity.END;footer.addView(about,ap);}
+        about.setOnClickListener(v->new AlertDialog.Builder(this).setTitle(R.string.app_name).setMessage(R.string.about_text).setPositiveButton(android.R.string.ok,null).show());
         fromButton.setOnClickListener(v->openPicker(true));toButton.setOnClickListener(v->openPicker(false));swap.setOnClickListener(v->{if(loading)return;Asset a=from;from=to;to=a;updatePair();});convert.setOnClickListener(v->convert());
         amount.addTextChangedListener(watcher(()->clearResult()));updatePair();body.requestFocus();
     }
@@ -80,9 +94,9 @@ public class MainActivity extends Activity {
     private String units(Asset a){return a.kind==Asset.Kind.METAL?"troy oz of "+a.name:a.code;}
     private String subtitle(Asset a){return a.code+(a.kind==Asset.Kind.METAL?" · troy oz":a.kind==Asset.Kind.CRYPTO?" · coin units":"");}
     private View assetRow(Asset a,boolean selected,boolean chevron){
-        LinearLayout row=new LinearLayout(this);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(10),dp(10),dp(12),dp(10));row.setMinimumHeight(dp(76));row.setBackground(surface(selected?0xffeaf0e3:0xfffffdfa));
-        AssetIconView icon=new AssetIconView(this,a);icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);row.addView(icon,new LinearLayout.LayoutParams(dp(52),dp(52)));
-        LinearLayout labels=column();labels.setPadding(dp(12),0,dp(6),0);row.addView(labels,new LinearLayout.LayoutParams(0,-2,1));add(labels,heading(a.name,20),0);add(labels,text(subtitle(a),12,MUTED),3);
+        LinearLayout row=new LinearLayout(this);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(10),dp(chevron?8:10),dp(12),dp(chevron?8:10));row.setMinimumHeight(dp(chevron?64:76));row.setBackground(surface(selected?0xffeaf0e3:0xfffffdfa));
+        AssetIconView icon=new AssetIconView(this,a);icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);row.addView(icon,new LinearLayout.LayoutParams(dp(chevron?44:52),dp(chevron?44:52)));
+        LinearLayout labels=column();labels.setPadding(dp(12),0,dp(6),0);row.addView(labels,new LinearLayout.LayoutParams(0,-2,1));add(labels,heading(a.name,chevron?18:20),0);add(labels,text(subtitle(a),12,MUTED),3);
         row.addView(text(chevron?"⌄":selected?"✓":"",22,GREEN),new LinearLayout.LayoutParams(dp(24),-2));row.setContentDescription(a.name+", "+subtitle(a)+(selected?", selected":""));return row;
     }
     private void updatePair(){
@@ -116,7 +130,7 @@ public class MainActivity extends Activity {
         picker.setOnDismissListener(d->{if(pickerMotion!=null){pickerMotion.destroy();pickerMotion=null;}picker=null;});picker.show();picker.getWindow().setLayout(Math.min(getResources().getDisplayMetrics().widthPixels-dp(24),dp(520)),(int)(getResources().getDisplayMetrics().heightPixels*.86));picker.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN|WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         content.setFocusableInTouchMode(true);content.requestFocus();filter.run();pickerMotion=new GlobeMotion(worldIcon);pickerMotion.setSelected(category[0]==0);pickerMotion.setActive(true);final GlobeMotion motion=pickerMotion;worldIcon.post(motion::refreshVisibility);
     }
-    private void clearResult(){if(result==null)return;resultLabel.setText("YOUR CONVERSION");result.setText("Ready to convert");status.setText("Choose your pair and tap Convert. Every reference rate has a date.");}
+    private void clearResult(){if(result==null)return;resultLabel.setText("YOUR CONVERSION");result.setText("Ready to convert");status.setText("Choose your pair and tap Convert. Rate dates appear with results.");}
     private void busy(boolean value){loading=value;convert.setEnabled(!value);fromButton.setEnabled(!value);toButton.setEnabled(!value);swap.setEnabled(!value);amount.setEnabled(!value);progress.setVisibility(value?View.VISIBLE:View.GONE);}
     private String quoteDetails(Asset a,RateRepository.Quote q){if(a.code.equals("USD"))return "USD · common reference base";return a.code+" · "+q.date+(q.age>3?" · older reference ("+q.age+" days)":"")+"\n"+(q.offline?"Saved rate · connection unavailable":q.saved?"Saved rate · reused locally":"Reference rate retrieved")+"\n"+q.source;}
     private void convert(){
