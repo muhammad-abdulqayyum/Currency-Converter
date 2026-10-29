@@ -80,10 +80,37 @@ final class ConverterCoreTests: XCTestCase {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
         let text = try String(contentsOf: root.appendingPathComponent("Resources/currencies.tsv"), encoding: .utf8)
         let assets = try Catalog.load(text)
-        XCTAssertEqual(assets.count, 165); XCTAssertEqual(Set(assets.map(\.code)).count, 165)
+        XCTAssertEqual(assets.count, 167); XCTAssertEqual(Set(assets.map(\.code)).count, 167)
         XCTAssertEqual(assets.filter { $0.category == .world }.count, 156)
         XCTAssertEqual(assets.filter { $0.category == .metals }.count, 4)
-        XCTAssertEqual(assets.filter { $0.category == .crypto }.count, 5)
+        XCTAssertEqual(assets.filter { $0.category == .crypto }.count, 7)
         XCTAssertThrowsError(try Catalog.load("BAD")); XCTAssertThrowsError(try Catalog.load("USD\tUS Dollar\t🇺🇸"))
     }
+    func testExactCryptoDenominations() throws {
+        let sat = Asset("SAT", "Satoshi (Bitcoin)", "sat", .crypto), drop = Asset("DROP", "Drops (XRP)", "drop", .crypto)
+        XCTAssertEqual(sat.rateCode, "BTC"); XCTAssertEqual(drop.rateCode, "XRP")
+        XCTAssertEqual(Conversion.digits(sat), 0); XCTAssertEqual(Conversion.digits(drop), 0)
+        XCTAssertEqual(try Conversion.cross(1, source: 1, target: sat.unitsPerCoin, digits: 0), 100_000_000)
+        XCTAssertEqual(try Conversion.cross(1, source: sat.unitsPerCoin, target: 1, digits: 8), Decimal(string: "0.00000001"))
+        XCTAssertEqual(try Conversion.cross(1, source: 1, target: drop.unitsPerCoin, digits: 0), 1_000_000)
+        XCTAssertEqual(try Conversion.cross(1, source: drop.unitsPerCoin, target: 1, digits: 6), Decimal(string: "0.000001"))
+        XCTAssertEqual(try Conversion.cross(100, source: 1000, target: 500000, digits: 0), 50000)
+    }
+    func testSatoshiUsesParentRateAndCache() async throws {
+        let sat = Asset("SAT", "Satoshi (Bitcoin)", "sat", .crypto), store = MemoryStore()
+        let body = payload(code: "BTC", rate: "0.00001", provider: "ESTV")
+        let repo = RateRepository(store: store, download: { asset in XCTAssertEqual(asset.code, "BTC"); return body })
+        let q = try await repo.get(sat, now: now)
+        XCTAssertEqual(q.rate, 1000); XCTAssertEqual(q.date, "2026-10-29"); XCTAssertTrue(q.source.contains("ESTV"))
+        XCTAssertNotNil(store.values["BTC"]); XCTAssertNil(store.values["SAT"])
+        let again = try await repo.get(sat, now: now); XCTAssertTrue(again.saved)
+    }
+    func testDropsPreserveParentOfflineFlags() async throws {
+        let drop = Asset("DROP", "Drops (XRP)", "drop", .crypto), store = MemoryStore()
+        store.values["XRP"] = Snapshot(data: payload(code: "XRP", rate: "0.5", date: "2026-10-25", provider: "ESTV"), fetchedAt: now.addingTimeInterval(-30000))
+        let repo = RateRepository(store: store, download: { asset in XCTAssertEqual(asset.code, "XRP"); throw ConverterError.unavailable })
+        let q = try await repo.get(drop, now: now)
+        XCTAssertEqual(q.rate, 500000); XCTAssertTrue(q.offline); XCTAssertTrue(q.saved); XCTAssertEqual(q.age, 4)
+    }
+
 }

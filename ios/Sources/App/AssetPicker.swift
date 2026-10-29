@@ -12,10 +12,20 @@ struct AssetIcon: View {
                     Text(asset.symbol).font(.system(size: 13, weight: .medium, design: .serif)).foregroundColor(Theme.navy)
                 }
             } else {
-                ZStack {
-                    Circle().fill(LinearGradient(colors: [Color.yellow.opacity(0.5), .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .overlay(Circle().stroke(Color.orange)).frame(width: 36, height: 36)
-                    Text(asset.symbol).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.navy)
+                ZStack(alignment: .bottomTrailing) {
+                    if ["ETH", "LTC", "XRP"].contains(asset.rateCode) {
+                        Image("Crypto" + asset.rateCode).resizable().scaledToFit().frame(width: 40, height: 40)
+                    } else {
+                        ZStack {
+                            Circle().fill(LinearGradient(colors: [Color.yellow.opacity(0.5), .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .overlay(Circle().stroke(Color.orange)).frame(width: 36, height: 36)
+                            Text(asset.code == "SAT" ? "₿" : asset.symbol).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.navy)
+                        }
+                    }
+                    if asset.isSubunit {
+                        Text(asset.code == "SAT" ? "sat" : "drop").font(.system(size: 8, weight: .bold)).foregroundColor(.white)
+                            .padding(.horizontal, 3).padding(.vertical, 2).background(Theme.navy).cornerRadius(3)
+                    }
                 }
             }
         }
@@ -83,14 +93,14 @@ struct AboutView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     Text("Universal Currency Converter").font(.system(.title2, design: .serif)).foregroundColor(Theme.navy)
-                    Text("Version 4.0.2 · iOS")
+                    Text("Version 4.0.3 · iOS")
                     Text("Created by Muhammad Hafiz Abdul-Qayyum\nFrom Clinton Hill, Brooklyn, New York City, USA")
                     Text("“From your Brother Muhammad Hafiz Abdul-Qayyum in the Wilderness of North America.”")
                     Text("For humanity. If Allah wills.")
                     Text("The original sun, crescent and star emblem celebrates light, possibility and connection.")
                     Text("Black American Heritage Flag: designed by Melvin Charles and Gleason T. Jackson (1967). SVG rendition by Xophe84, Wikimedia Commons (CC0).")
                     Text("Data: Frankfurter and its official-source providers. Crypto: Swiss Federal Tax Administration (ESTV). These are dated reference conversions, not executable trading quotes. Both source dates are shown. Different dates are labeled as indicative comparisons.")
-                    Text("Metals use troy ounces (31.1034768 g). Crypto uses coin units. Dealer premiums, transaction fees and spreads are excluded. Flags identify currencies and are not a statement about sovereignty.")
+                    Text("Metals use troy ounces (31.1034768 g). Crypto uses coin units. Satoshi: 100,000,000 per BTC. Drops: 1,000,000 per XRP. Subunit outputs round to whole units. Dealer premiums, transaction fees and spreads are excluded. Flags identify currencies and are not a statement about sovereignty.")
                     Text("Only reference-rate snapshots are cached on this device, reused for six hours. A failed refresh may use a saved quote up to seven days old, clearly labeled. Amounts and conversion history are not saved. No ads or analytics SDKs are included.")
                     Link("Frankfurter sources and documentation", destination: URL(string: "https://frankfurter.dev")!)
                 }.font(.body).foregroundColor(Theme.muted).padding(20).frame(maxWidth: 600)

@@ -32,6 +32,7 @@ public final class Conversion {
         if(rate.signum()<=0 || rate.precision()>30 || Math.abs(rate.scale())>30)throw new IllegalArgumentException("Invalid rate");
     }
     public static int digits(String code) {
+        if(code.equals("SAT") || code.equals("DROP")) return 0;
         if (code.equals("BTC") || code.equals("ETH") || code.equals("BCH") || code.equals("LTC")) return 8;
         if (code.equals("XRP")) return 6;
         if (code.equals("XAU") || code.equals("XAG") || code.equals("XPT") || code.equals("XPD")) return 8;

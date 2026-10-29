@@ -40,6 +40,7 @@ enum Theme {
         } catch { self.error = error.localizedDescription }
     }
     var sourceUnit: String {
+        if from.isSubunit { return from.code == "SAT" ? "100,000,000 satoshis = 1 BTC" : "1,000,000 drops = 1 XRP" }
         switch from.category {
         case .world: return "\(from.code) · \(from.name)"
         case .metals: return "Troy ounces of \(from.name) · 1 troy oz = 31.1034768 g"
@@ -50,6 +51,7 @@ enum Theme {
         var lines: [String] = []
         if from.category == .metals || to.category == .metals { lines.append("Metals use troy ounces. Dealer premiums are excluded.") }
         if from.category == .crypto || to.category == .crypto { lines.append("Crypto uses dated Swiss reference values, not live prices.") }
+        if from.isSubunit || to.isSubunit { lines.append("Satoshi and drop outputs are rounded to whole units.") }
         return lines.joined(separator: "\n")
     }
     func clear() { result = "Ready to convert"; details = "Choose your pair and tap Convert. Rate dates appear with results."; error = nil }
@@ -64,6 +66,14 @@ enum Theme {
         if source.code == target.code {
             result = Conversion.display(value, asset: target, positiveInput: value > 0, exact: true)
             details = "Same asset · exact amount. No rate lookup needed."; return
+        }
+        if source.rateCode == target.rateCode {
+            do {
+                let output = try Conversion.cross(value, source: source.unitsPerCoin, target: target.unitsPerCoin, digits: Conversion.digits(target))
+                result = Conversion.display(output, asset: target, positiveInput: value > 0)
+                details = "Fixed denomination conversion · 1 " + source.rateCode + " = " + (source.rateCode == "BTC" ? "100,000,000 satoshis" : "1,000,000 drops") + ". No rate lookup needed."
+            } catch { self.error = error.localizedDescription }
+            return
         }
         loading = true; result = "Getting your rate…"; details = "Checking reference values…"
         Task {

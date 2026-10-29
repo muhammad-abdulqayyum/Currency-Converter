@@ -93,7 +93,7 @@ public class MainActivity extends Activity {
     private TextWatcher watcher(Runnable changed){return new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int b,int c){changed.run();}public void afterTextChanged(Editable e){}};}
     private Asset find(String code){for(List<Asset> group:groups)for(Asset a:group)if(a.code.equals(code))return a;return groups.get(0).get(0);}
     private String units(Asset a){return a.kind==Asset.Kind.METAL?"troy oz of "+a.name:a.code;}
-    private String subtitle(Asset a){return a.code+(a.kind==Asset.Kind.METAL?" · troy oz":a.kind==Asset.Kind.CRYPTO?" · coin units":"");}
+    private String subtitle(Asset a){if(a.isSubunit())return a.code+" · "+a.rateCode()+" subunit";return a.code+(a.kind==Asset.Kind.METAL?" · troy oz":a.kind==Asset.Kind.CRYPTO?" · coin units":"");}
     private View assetRow(Asset a,boolean selected,boolean chevron){
         LinearLayout row=new LinearLayout(this);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(10),dp(chevron?8:10),dp(12),dp(chevron?8:10));row.setMinimumHeight(dp(chevron?64:76));row.setBackground(surface(selected?0xffeaf0e3:0xfffffdfa));
         AssetIconView icon=new AssetIconView(this,a);icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);row.addView(icon,new LinearLayout.LayoutParams(dp(chevron?44:52),dp(chevron?44:52)));
@@ -103,9 +103,10 @@ public class MainActivity extends Activity {
     private void updatePair(){
         fromButton.removeAllViews();fromButton.addView(assetRow(from,false,true));fromButton.setFocusable(true);fromButton.setContentDescription("From: "+from.name+". Choose source asset");
         toButton.removeAllViews();toButton.addView(assetRow(to,false,true));toButton.setFocusable(true);toButton.setContentDescription("To: "+to.name+". Choose destination asset");
-        unit.setText(from.kind==Asset.Kind.METAL?"Troy ounces of "+from.name+" · 1 troy oz = 31.1034768 g":from.kind==Asset.Kind.CRYPTO?from.code+" · units of "+from.name:from.code+" · "+from.name);
+        unit.setText(from.isSubunit()?(from.code.equals("SAT")?"100,000,000 satoshis = 1 BTC":"1,000,000 drops = 1 XRP"):from.kind==Asset.Kind.METAL?"Troy ounces of "+from.name+" · 1 troy oz = 31.1034768 g":from.kind==Asset.Kind.CRYPTO?from.code+" · units of "+from.name:from.code+" · "+from.name);
         String n="";if(from.kind==Asset.Kind.METAL||to.kind==Asset.Kind.METAL)n="Metals use troy ounces. Dealer premiums are excluded.";
         if(from.kind==Asset.Kind.CRYPTO||to.kind==Asset.Kind.CRYPTO)n+=(n.isEmpty()?"":"\n")+"Crypto uses dated Swiss reference values, not live prices.";
+        if(from.isSubunit()||to.isSubunit())n+=(n.isEmpty()?"":"\n")+"Satoshi and drop outputs are rounded to whole units.";
         note.setText(n);note.setVisibility(n.isEmpty()?View.GONE:View.VISIBLE);amount.setError(null);clearResult();
     }
     private void hideKeyboard(){((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(amount.getWindowToken(),0);}
@@ -139,12 +140,12 @@ public class MainActivity extends Activity {
         try{input=Conversion.assetAmount(amount.getText().toString());amount.setError(null);}catch(IllegalArgumentException e){amount.setError("Enter 0 to 1 trillion, with up to 8 decimal places. Use a decimal point.");amount.requestFocus();return;}
         hideKeyboard();final Asset source=from,target=to;busy(true);result.setText("Getting your rate…");status.setText("Checking reference values…");
         executor.execute(()->{try{
-            boolean same=source.code.equals(target.code);RateRepository.Quote first=same?null:repository.get(source),second=same?null:repository.get(target);
-            BigDecimal output=same?input:Conversion.cross(input,first.rate,second.rate,target.code);
+            boolean same=source.code.equals(target.code),fixed=source.rateCode().equals(target.rateCode());RateRepository.Quote first=fixed?null:repository.get(source),second=fixed?null:repository.get(target);
+            BigDecimal output=same?input:fixed?Conversion.cross(input,source.unitsPerCoin(),target.unitsPerCoin(),target.code):Conversion.cross(input,first.rate,second.rate,target.code);
             NumberFormat format=NumberFormat.getNumberInstance();format.setMaximumFractionDigits(same?Math.max(Conversion.digits(target.code),input.scale()):Conversion.digits(target.code));format.setMinimumFractionDigits(target.kind==Asset.Kind.WORLD?Conversion.digits(target.code):0);
             String value=output.signum()==0&&input.signum()>0?"< "+format.format(BigDecimal.ONE.movePointLeft(Conversion.digits(target.code))):format.format(output);final String display=value+" "+units(target);
-            String details=same?"Same asset · exact amount. No rate lookup needed.":quoteDetails(source,first)+"\n\n"+quoteDetails(target,second);
-            if(!same&&!source.code.equals("USD")&&!target.code.equals("USD")&&!first.date.equals(second.date))details+="\n\nDifferent reference dates: this is an indicative comparison.";
+            String details=same?"Same asset · exact amount. No rate lookup needed.":fixed?"Fixed denomination conversion · 1 "+source.rateCode()+" = "+(source.rateCode().equals("BTC")?"100,000,000 satoshis":"1,000,000 drops")+". No rate lookup needed.":quoteDetails(source,first)+"\n\n"+quoteDetails(target,second);
+            if(!fixed&&!source.code.equals("USD")&&!target.code.equals("USD")&&!first.date.equals(second.date))details+="\n\nDifferent reference dates: this is an indicative comparison.";
             final String description=details;runOnUiThread(()->{if(destroyed)return;busy(false);resultLabel.setText(input.stripTrailingZeros().toPlainString()+" "+units(source)+" EQUALS");result.setText(display);status.setText(description);});
         }catch(Exception e){runOnUiThread(()->{if(destroyed)return;busy(false);result.setText(R.string.unavailable);status.setText(R.string.unavailable_detail);});}});
     }
@@ -176,7 +177,9 @@ public class MainActivity extends Activity {
         crypto.add(new Asset("ETH", "Ethereum", "Ξ", Asset.Kind.CRYPTO));
         crypto.add(new Asset("XRP", "XRP", "◎", Asset.Kind.CRYPTO));
         crypto.add(new Asset("LTC", "Litecoin", "Ł", Asset.Kind.CRYPTO));
-        crypto.add(new Asset("BCH", "Bitcoin Cash", "₿", Asset.Kind.CRYPTO)); groups.add(crypto);
+        crypto.add(new Asset("BCH", "Bitcoin Cash", "₿", Asset.Kind.CRYPTO));
+        crypto.add(new Asset("SAT", "Satoshi (Bitcoin)", "sat", Asset.Kind.CRYPTO));
+        crypto.add(new Asset("DROP", "Drops (XRP)", "drop", Asset.Kind.CRYPTO)); groups.add(crypto);
     }
 
 }

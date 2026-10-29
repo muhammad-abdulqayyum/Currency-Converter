@@ -81,6 +81,13 @@ public actor RateRepository {
         self.store = store; self.download = download
     }
     public func get(_ asset: Asset, now: Date = Date()) async throws -> Quote {
+        if asset.isSubunit {
+            let parent = Asset(asset.rateCode, asset.rateCode, asset.symbol, .crypto)
+            let quote = try await get(parent, now: now)
+            return Quote(rate: quote.rate * asset.unitsPerCoin, date: quote.date,
+                         source: quote.source + "\nDerived from " + asset.rateCode + " denomination",
+                         saved: quote.saved, offline: quote.offline, age: quote.age)
+        }
         if asset.code == "USD" { return Quote(rate: 1, date: "base", source: "USD reference base", saved: false, offline: false, age: 0) }
         let stored = store.read(asset.code)
         if let s = stored, now >= s.fetchedAt, now.timeIntervalSince(s.fetchedAt) < RatePolicy.ttl,

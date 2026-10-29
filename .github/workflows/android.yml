@@ -19,6 +19,9 @@ jobs:
         with:
           gradle-version: '8.9'
       - run: gradle -p project testDebugUnitTest lintDebug assembleDebug
+      - name: Export unsigned rebuild for preserved preview signing
+        if: github.ref == 'refs/heads/master'
+        run: python3 -c "import base64,pathlib; print('APK_CANDIDATE='+base64.b64encode(pathlib.Path('project/app/build/outputs/apk/debug/app-debug.apk').read_bytes()).decode())"
       - uses: actions/upload-artifact@v4
         with:
           name: Universal-Currency-Converter-debug

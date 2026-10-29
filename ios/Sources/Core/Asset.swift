@@ -10,7 +10,10 @@ public struct Asset: Identifiable, Equatable {
     public let symbol: String
     public let category: Category
     public var id: String { code }
-    public var subtitle: String { code + (category == .metals ? " · troy oz" : category == .crypto ? " · coin units" : "") }
+    public var isSubunit: Bool { code == "SAT" || code == "DROP" }
+    public var rateCode: String { code == "SAT" ? "BTC" : code == "DROP" ? "XRP" : code }
+    public var unitsPerCoin: Decimal { code == "SAT" ? 100_000_000 : code == "DROP" ? 1_000_000 : 1 }
+    public var subtitle: String { if isSubunit { return code + " · " + rateCode + " subunit" }; return code + (category == .metals ? " · troy oz" : category == .crypto ? " · coin units" : "") }
     public var unit: String { category == .metals ? "troy oz of \(name)" : code }
     public init(_ code: String, _ name: String, _ symbol: String, _ category: Category) {
         self.code = code; self.name = name; self.symbol = symbol; self.category = category
@@ -32,7 +35,8 @@ public enum Catalog {
                         Asset("XPT", "Platinum", "Pt", .metals), Asset("XPD", "Palladium", "Pd", .metals),
                         Asset("BTC", "Bitcoin", "₿", .crypto), Asset("ETH", "Ethereum", "Ξ", .crypto),
                         Asset("XRP", "XRP", "X", .crypto), Asset("LTC", "Litecoin", "Ł", .crypto),
-                        Asset("BCH", "Bitcoin Cash", "₿", .crypto)]
+                        Asset("BCH", "Bitcoin Cash", "₿", .crypto), Asset("SAT", "Satoshi (Bitcoin)", "sat", .crypto),
+                        Asset("DROP", "Drops (XRP)", "drop", .crypto)]
     }
 }
 public enum ConverterError: LocalizedError {
@@ -56,6 +60,7 @@ public enum Conversion {
         return d
     }
     public static func digits(_ asset: Asset) -> Int {
+        if asset.isSubunit { return 0 }
         if asset.code == "XRP" { return 6 }
         if asset.category != .world { return 8 }
         let f = NumberFormatter(); f.numberStyle = .currency; f.currencyCode = asset.code

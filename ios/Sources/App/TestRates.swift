@@ -8,11 +8,11 @@ final class TestSnapshotStore: SnapshotStore {
 }
 enum TestRates {
     static func download(_ asset: Asset) async throws -> Data {
-        let rates = ["GBP": "0.8", "BRL": "5", "PHP": "60", "XAU": "0.00025", "XAG": "0.025", "BTC": "0.00001"]
+        let rates = ["GBP": "0.8", "BRL": "5", "PHP": "60", "XAU": "0.00025", "XAG": "0.025", "BTC": "0.00001", "XRP": "0.5"]
         guard let rate = rates[asset.code] else { throw ConverterError.unavailable }
         let f = DateFormatter(); f.timeZone = TimeZone(secondsFromGMT: 0); f.locale = Conversion.posix; f.dateFormat = "yyyy-MM-dd"
         let date = f.string(from: Date().addingTimeInterval(asset.code == "BTC" ? -86400 : 0))
-        return Data("{\"base\":\"USD\",\"quote\":\"\(asset.code)\",\"date\":\"\(date)\",\"rate\":\(rate),\"providers\":[{\"key\":\"\(asset.code == "BTC" ? "ESTV" : "ECB")\"}]}".utf8)
+        return Data("{\"base\":\"USD\",\"quote\":\"\(asset.code)\",\"date\":\"\(date)\",\"rate\":\(rate),\"providers\":[{\"key\":\"\(asset.category == .crypto ? "ESTV" : "ECB")\"}]}".utf8)
     }
 }
 #endif

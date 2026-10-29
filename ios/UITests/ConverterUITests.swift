@@ -20,7 +20,7 @@ final class ConverterUITests: XCTestCase {
     }
     private func choose(_ side: String, _ category: String, _ code: String) {
         app.swipeDown(); tap(side); tap(category + "Tab")
-        if category == "World" {
+        if category == "World" || category == "Crypto" {
             let search = app.searchFields.firstMatch; search.tap(); search.typeText(code)
         }
         tap("asset_" + code)
@@ -39,6 +39,14 @@ final class ConverterUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["details"].label.contains("Different reference dates"))
         choose("toAsset", "Metals", "XAG"); convert("250,000 troy oz of Silver")
         choose("fromAsset", "Metals", "XPD"); choose("toAsset", "Metals", "XPD"); convert("100 troy oz of Palladium")
+    }
+    func testCryptoUnits() {
+        choose("fromAsset", "Crypto", "BTC"); choose("toAsset", "Crypto", "SAT"); convert("10,000,000,000 SAT")
+        XCTAssertTrue(app.staticTexts["details"].label.contains("No rate lookup needed"))
+        tap("swap"); convert("0.000001 BTC")
+        choose("fromAsset", "Crypto", "XRP"); choose("toAsset", "Crypto", "DROP"); convert("100,000,000 DROP")
+        tap("swap"); convert("0.0001 XRP")
+        choose("fromAsset", "Crypto", "SAT"); choose("toAsset", "Crypto", "DROP"); convert("50,000 DROP")
     }
     func testSearchAndWorldConversion() {
         tap("fromAsset")
@@ -59,7 +67,7 @@ final class ConverterUITests: XCTestCase {
         }
         let screenshot = XCTAttachment(screenshot: app.screenshot()); screenshot.name = "iOS Home"; screenshot.lifetime = .keepAlways; add(screenshot)
         for _ in 0..<3 where !app.buttons["about"].isHittable { app.swipeUp() }
-        tap("about"); XCTAssertTrue(app.staticTexts["Version 4.0.2 · iOS"].waitForExistence(timeout: 5))
+        tap("about"); XCTAssertTrue(app.staticTexts["Version 4.0.3 · iOS"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Clinton Hill")).firstMatch.exists)
     }
     func testLargeTextAndLandscapeFooter() {
@@ -70,6 +78,6 @@ final class ConverterUITests: XCTestCase {
         defer { XCUIDevice.shared.orientation = .portrait }
         for _ in 0..<8 where !app.buttons["about"].isHittable { app.swipeUp() }
         tap("about")
-        XCTAssertTrue(app.staticTexts["Version 4.0.2 · iOS"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Version 4.0.3 · iOS"].waitForExistence(timeout: 5))
     }
 }

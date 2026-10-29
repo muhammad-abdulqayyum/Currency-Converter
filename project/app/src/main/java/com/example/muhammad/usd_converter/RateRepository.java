@@ -25,6 +25,10 @@ public final class RateRepository {
     private final SharedPreferences cache;
     public RateRepository(SharedPreferences cache) { this.cache = cache; }
     public Quote get(Asset asset) throws Exception {
+        if(asset.isSubunit()) {
+            Quote parent=get(new Asset(asset.rateCode(),asset.rateCode(),asset.icon,Asset.Kind.CRYPTO));
+            return new Quote(parent.rate.multiply(asset.unitsPerCoin()),parent.date,parent.source+"\nDerived from "+asset.rateCode()+" denomination",parent.saved,parent.offline,parent.age);
+        }
         if(asset.code.equals("USD"))return new Quote(BigDecimal.ONE,"base","USD reference base",false,false,0);
         long now = System.currentTimeMillis();
         String key = "v3." + asset.code;
