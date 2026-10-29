@@ -1,14 +1,16 @@
 # Universal Currency Converter for iPhone and iPad
 
-Native Swift/SwiftUI version 4.0.2 by Muhammad Hafiz Abdul-Qayyum, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
+Native Swift/SwiftUI version 4.0.3 by Muhammad Hafiz Abdul-Qayyum, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
 Minimum deployment target: **iOS/iPadOS 15.0**. Universal iPhone/iPad interface; portrait and landscape; safe-area insets; Dynamic Type and VoiceOver labels; scrolls on small screens and with larger text. Uses only Apple frameworks, with no third-party runtime dependencies. Keep the Android APK for Android; it cannot install on iOS.
 
 ## Features
 
-The same 165 assets as Android: 156 world currencies, four metals and five cryptocurrencies. Independent searchable From/To pickers, centered swap, decimal conversion, six-hour local reference cache, explicitly labeled offline fallback up to seven rate-date days, source/date disclosure, ESTV validation for crypto and troy-ounce metal units. Cream/navy serif design, original emblem and Black American Heritage Flag footer.
+The same 167 assets as Android: 156 world currencies, four metals and five cryptocurrencies plus Bitcoin satoshis and XRP drops. Independent searchable From/To pickers, centered swap, decimal conversion, six-hour local reference cache, explicitly labeled offline fallback up to seven rate-date days, source/date disclosure, ESTV validation for crypto and troy-ounce metal units. Cream/navy serif design, original emblem and Black American Heritage Flag footer.
 
 Only rate snapshots are written into the OS-purgeable app cache. Amounts and history are not saved. HTTPS only, no redirects, bounded 64 KiB responses, connection/resource timeouts, no ads or analytics. Fiat and metal availability depends on the upstream provider. Crypto is dated Swiss reference data, not live market prices.
+
+BTC ↔ SAT and XRP ↔ DROP are fixed denomination conversions and work without a rate lookup. Other pairs reuse the parent coin quote, provenance, date and cache. SAT/DROP outputs round to whole units. The ETH/LTC/XRP icons are bundled locally; no image network calls are added.
 
 ## Open and run on a Mac
 

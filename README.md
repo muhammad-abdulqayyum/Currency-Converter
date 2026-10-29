@@ -1,24 +1,30 @@
-# Universal Currency Converter · Version 4.0.2
+# Universal Currency Converter · Version 4.0.3
 
 By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
-**[Download Version 4.0.2](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.2.apk)** · Android 6.0+ · debug-signed preview.
+**[Download Version 4.0.3](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.3.apk)** · Android 6.0+ · debug-signed preview.
 
 ## iPhone and iPad
 
-A native Swift/SwiftUI version is included in [`ios/`](ios/README.md), targeting iOS/iPadOS 15.0 and later, with the same 165 assets and independent pickers. [Validation results](docs/ios-validation.md). See the [iOS build and simulator checks](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/ios.yml) for validation. TestFlight/App Store distribution requires Apple signing and your developer account; the Android APK does not run on iOS.
+A native Swift/SwiftUI version is included in [`ios/`](ios/README.md), targeting iOS/iPadOS 15.0 and later, with the same 167 assets and independent pickers. [Validation results](docs/version-4.0.3-validation.md). See the [iOS build and simulator checks](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/ios.yml) for validation. TestFlight/App Store distribution requires Apple signing and your developer account; the Android APK does not run on iOS.
 
-## Version 4.0.2
+## Version 4.0.3
 
 The default screen uses a compact header, a compact circular Swap centered between From and To, and a footer with the heritage flag on the left, the full author credit beside it, and About on the right. Spare vertical space places the footer at the bottom. Narrow screens or larger text move About below the credit and allow natural scrolling.
 
 The visible swap circle is 30 dp with crisp horizontal arrows; its accessible touch target is 48 × 48 dp. The cream/navy colors, serif typography and heritage footer are retained.
 
+## Crypto units in 4.0.3
+
+Satoshi (Bitcoin), code `SAT`, and Drops (XRP), code `DROP`, join the five coins in the Crypto picker. These are denominations, not additional coins: **1 BTC = 100,000,000 satoshis** and **1 XRP = 1,000,000 drops**. BTC ↔ SAT and XRP ↔ DROP use fixed unit ratios without fetching market rates. Other pairs derive the unit rate from the existing BTC or XRP quote and retain its provider, date, cached/offline state and freshness limits. No additional rate API is used. Converted SAT/DROP results round to whole units; a positive result below the smallest displayed unit is labeled `< 1`.
+
+ETH, LTC and XRP now use matching bundled recognition icons on Android and iOS, with small badges distinguishing SAT and DROP from their parent coins. The major version label remains VERSION 4; About reports 4.0.3. Android 6.0+ and iOS/iPadOS 15.0 deployment targets are retained.
+
 ## Version 4 features
 
 Choose **From** and **To** independently. Both pickers offer **World**, **Metals**, and **Crypto** tabs and search by name or code. Tap an asset to select it immediately. **Swap** reverses the pair while keeping the entered number; the source unit changes visibly.
 
-Convert across categories: BRL → PHP, gold → silver, BTC → gold, XRP → BTC, and other available pairs. The catalog contains **156 world currencies** (including USD), **four metals** (gold, silver, platinum, palladium), and **five cryptocurrencies** (BTC, ETH, XRP, LTC, BCH): **165 selectable assets**.
+Convert across categories: BRL → PHP, gold → silver, BTC → gold, XRP → BTC, and other available pairs. The catalog contains **156 world currencies** (including USD), **four metals** (gold, silver, platinum, palladium), and **seven crypto choices** (BTC, ETH, XRP, LTC, BCH, plus Bitcoin satoshis and XRP drops): **167 selectable assets**.
 
 The cream/navy interface uses serif asset names, locally drawn bullion marked Au/Ag/Pt/Pd, coin illustrations and a gentle Americas-centered globe inside the picker. System animation preferences are respected. The scrollable footer keeps the Black American Heritage Flag, author credit and About button together.
 
@@ -44,7 +50,7 @@ HTTPS certificate validation, connection/read timeouts, response size limits and
 
 ## Install and build
 
-Version 4.0.2 uses version code 42 and the same preview signing certificate as 4.0 and 4.0.1, allowing an in-place update. Older 3.x previews used a different certificate and may require uninstalling once. The preview key is backed up privately for future updates. Production publishing needs a separately prepared release and private signing/upload key; never commit private keys.
+Version 4.0.3 uses version code 43 and the same preview signing certificate as earlier 4.x previews, allowing an in-place update. Older 3.x previews used a different certificate and may require uninstalling once. The preview key is backed up privately for future updates. Production publishing needs a separately prepared release and private signing/upload key; never commit private keys.
 
 [Version 4.0](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.apk) · [Version 4.0 history](docs/version-4.0-history.md)
 
@@ -57,15 +63,15 @@ gradle -p project testDebugUnitTest lintDebug assembleDebug
 python3 scripts/validate_rates.py
 ```
 
-Minimum Android 6.0/API 23; compile/target SDK 35. Play publishing needs a production build and review of current store requirements. See [4.0.2 layout validation](docs/version-4.0.2-validation.md) and [Version 4 conversion validation](docs/version-4-validation.md).
+Minimum Android 6.0/API 23; compile/target SDK 35. Play publishing needs a production build and review of current store requirements. See [4.0.3 validation](docs/version-4.0.3-validation.md) and [Version 4 conversion validation](docs/version-4-validation.md).
 
 ## Preview
 
-![Version 4 main screen](docs/screenshots/v402-home.png)
+![Version 4 main screen](docs/screenshots/v403-home.png)
 
-![Metals picker](docs/screenshots/v402-metals-picker.png)
+![Metals picker](docs/screenshots/v403-metals-picker.png)
 
-[Larger text and the responsive footer](docs/screenshots/v402-large-footer.png)
+[Larger text and the responsive footer](docs/screenshots/v403-large-footer.png)
 
 ## About
 
