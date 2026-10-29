@@ -59,11 +59,12 @@ public class MainActivity extends Activity {
         TextView label=text("Amount",13,MUTED);label.setLabelFor(R.id.editText);add(card,label,0);
         amount=new EditText(this);amount.setId(R.id.editText);amount.setInputType(8194);amount.setSingleLine(true);amount.setTextSize(27);amount.setTextColor(NAVY);amount.setMinHeight(dp(48));amount.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(22)});amount.setText(initial);add(card,amount,0);
         unit=text("",12,MUTED);add(card,unit,2);
-        LinearLayout pairHeading=new LinearLayout(this);pairHeading.setGravity(Gravity.CENTER_VERTICAL);add(body,pairHeading,8);
-        TextView fromLabel=text("From",13,MUTED);pairHeading.addView(fromLabel,new LinearLayout.LayoutParams(0,-2,1));
-        swap=new Button(this);swap.setId(R.id.swap);swap.setText("⇅  Swap");swap.setTextSize(13);swap.setTextColor(GREEN);swap.setAllCaps(false);swap.setBackground(surface(CREAM));swap.setContentDescription("Swap source and destination; keep the entered amount");pairHeading.addView(swap,new LinearLayout.LayoutParams(dp(104),dp(48)));
-        fromButton=column();fromButton.setId(R.id.from_asset);add(body,fromButton,0);
-        add(body,text("To",13,MUTED),10);toButton=column();toButton.setId(R.id.to_asset);add(body,toButton,4);
+        add(body,text("From",13,MUTED),14);
+        fromButton=column();fromButton.setId(R.id.from_asset);add(body,fromButton,4);
+        FrameLayout pairGap=new FrameLayout(this);body.addView(pairGap,new LinearLayout.LayoutParams(-1,dp(48)));
+        TextView toLabel=text("To",13,MUTED);FrameLayout.LayoutParams toLabelParams=new FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM|Gravity.START);pairGap.addView(toLabel,toLabelParams);
+        swap=new SwapButton(this);swap.setId(R.id.swap);swap.setContentDescription("Swap source and destination; keep the entered amount");pairGap.addView(swap,new FrameLayout.LayoutParams(dp(48),dp(48),Gravity.CENTER));
+        toButton=column();toButton.setId(R.id.to_asset);add(body,toButton,4);
         note=text("",12,MUTED);add(body,note,8);
         convert=new Button(this);convert.setId(R.id.convert);convert.setText("Convert");convert.setAllCaps(false);convert.setTextColor(0xffffffff);convert.setTextSize(17);convert.setMinHeight(dp(52));convert.setBackground(surface(NAVY));add(body,convert,12);
         progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);progress.setIndeterminate(true);progress.setVisibility(View.GONE);add(body,progress,4);
