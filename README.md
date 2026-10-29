@@ -8,6 +8,8 @@ Enter a USD amount, choose **World Currencies**, **Metals**, or **Crypto**, sele
 
 ## Version 3.2
 
+The main screen keeps **VERSION 3 · FOR HUMANITY**; About shows the precise 3.1 or 3.2 version. The static 3.1 APK was rebuilt from commit `859669e` with this same label update.
+
 Everything in 3.1, plus one gentle west-to-east globe revolution over ten seconds, resting on the Americas. Tap World Currencies to replay. The globe pauses in the background, when scrolled out of view, or while another category is selected. Disabling system animations keeps the globe static. No continuous spin, network request or animation library is needed.
 
 [Install 3.1 (static)](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-3.1.apk) · [Install 3.2 (rotating)](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-3.2.apk)
@@ -42,8 +44,8 @@ Both builds use the same debug certificate. They replace each other; installing 
 - Both 3.1 and 3.2 installed and launched on Android 6/API 23. Checked all three categories, the heritage flag footer, About credit, and upgrade from 3.1 to 3.2.
 - Native 3.2 frames confirm rotation and return to the identical 3.1 Americas view. With system animator duration scale set to zero, successive globe frames are identical. Also checked a narrow screen with larger text.
 - 21 JVM unit tests passed; Android lint completed without errors.
-- Version 3.2 debug APK measured 93,279 bytes.
-- Version 3.1 debug APK measured 90,799 bytes.
+- Version 3.2 debug APK measured 93,283 bytes.
+- Version 3.1 debug APK measured 90,803 bytes.
 - Earlier Version 3.0 validation: installed and launched on an Android 6.0/API 23 emulator. Exercised GBP, gold and BTC conversion screens with validated live-feed snapshots seeded into the local cache, and checked a narrow screen with enlarged text. No runtime crash was observed.
 - The separate live-feed check validated all 164 USD pairs. The emulator smoke check does not establish end-to-end network behavior on every supported phone.
 

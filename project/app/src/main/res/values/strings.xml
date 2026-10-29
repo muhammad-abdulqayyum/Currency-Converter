@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Universal Currency Converter</string>
     <string name="brand">UNIVERSAL\nCURRENCY CONVERTER</string>
-    <string name="eyebrow">VERSION 3.2 · FOR HUMANITY</string>
+    <string name="eyebrow">VERSION 3 · FOR HUMANITY</string>
     <string name="headline">A world within reach.</string>
     <string name="subtitle">One amount. A world of possibilities.</string>
     <string name="amount_label">Amount in US dollars</string>
