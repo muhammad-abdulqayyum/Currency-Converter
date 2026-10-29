@@ -25,6 +25,7 @@ public final class RateRepository {
     private final SharedPreferences cache;
     public RateRepository(SharedPreferences cache) { this.cache = cache; }
     public Quote get(Asset asset) throws Exception {
+        if(asset.code.equals("USD"))return new Quote(BigDecimal.ONE,"base","USD reference base",false,false,0);
         long now = System.currentTimeMillis();
         String key = "v3." + asset.code;
         String stored = cache.getString(key, null);
