@@ -8,5 +8,11 @@
   "lintErrors": 0,
   "liveFeedPairsValidated": 164,
   "selectableAssets": 165,
-  "signerSha256": "648d41550ab8f7b9b34618551fd3002199f0e2bc1bb4d792d4f20712d2f85c93"
+  "signerSha256": "648d41550ab8f7b9b34618551fd3002199f0e2bc1bb4d792d4f20712d2f85c93",
+  "deviceApi": 23,
+  "deviceWorkflowRun": 40929864665,
+  "deviceChecks": "passed",
+  "largeTextScale": 1.3,
+  "largeLayout": "360x800",
+  "largeTextFooterAbout": "passed"
 }

@@ -20,3 +20,22 @@ This reconstruction uses a new debug certificate. A differently signed 3.x APK m
 ## Limits
 
 Crypto and metal values are reference quotes, not executable trading prices. Each leg may have a different reference date; the result labels that explicitly. This validation does not establish end-to-end network behavior on every Android phone or guarantee future API availability. Synthetic test rates used in the emulator are not bundled into the APK.
+
+## Reproduce the device checks
+
+On a dedicated, booted Android emulator with `ANDROID_HOME` set, run:
+
+```sh
+python3 scripts/android_smoke.py
+```
+
+The script installs the committed APK and places synthetic reference rates in the emulator cache. Test artifacts are written to `device-checks/`. The GitHub Android 6 device workflow runs the same script using hardware acceleration.
+
+## Android 6 device check — passed
+
+The exact committed APK passed the hardware-accelerated API 23 workflow:
+https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/40929864665
+
+Verified installation and launch, World/Metals/Crypto selection, code search, gold → USD, USD → gold via Swap, Bitcoin → gold, Bitcoin → silver, BRL → PHP, and same-asset palladium conversion. Synthetic fixtures establish expected arithmetic independently of changing prices. The differing BTC reference date was explicitly labeled. About showed Version 4.0.
+
+A 360×800 layout with 1.3× font scaling also passed picker selection and footer navigation. No app fatal exception was observed. Screenshots are in `docs/screenshots/v4-*.png`. This run validates the packaged APK, rather than relying only on a separately rebuilt CI artifact.
