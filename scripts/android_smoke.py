@@ -56,14 +56,14 @@ def launch():
  adb('shell','am','force-stop',PKG);adb('shell','am','start','-W','-n',PKG+'/.MainActivity');time.sleep(1)
 serial=adb('get-serialno').decode().strip()
 assert serial.startswith('emulator-'),'Use a dedicated emulator only'
-adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.1.apk'))
 adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.2.apk'))
-print('PASS: upgrade 4.0.1 to 4.0.2',flush=True)
+adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.3.apk'))
+print('PASS: upgrade 4.0.2 to 4.0.3',flush=True)
 adb('shell','wm','size','420x900');adb('shell','wm','density','160');adb('shell','input','keyevent','82');adb('logcat','-c')
 now=int(time.time()*1000);day=datetime.datetime.now(datetime.timezone.utc).date();prefs=['<map>']
-for code,rate in {'GBP':'0.8','BRL':'5','PHP':'60','XAU':'0.00025','XAG':'0.025','BTC':'0.00001'}.items():
+for code,rate in {'GBP':'0.8','BRL':'5','PHP':'60','XAU':'0.00025','XAG':'0.025','BTC':'0.00001','XRP':'0.5'}.items():
  date=(day-datetime.timedelta(days=1) if code=='BTC' else day).isoformat()
- body=json.dumps({'base':'USD','quote':code,'rate':rate,'date':date,'providers':[{'key':'ESTV' if code=='BTC' else 'ECB'}]})
+ body=json.dumps({'base':'USD','quote':code,'rate':rate,'date':date,'providers':[{'key':'ESTV' if code in ['BTC','XRP'] else 'ECB'}]})
  prefs.append('<string name="v3.'+code+'">'+esc.escape(body)+'</string><long name="v3.'+code+'.time" value="'+str(now)+'"/>')
 prefs.append('</map>');(OUT/'fixture.xml').write_text(''.join(prefs));adb('push',str(OUT/'fixture.xml'),'/data/local/tmp/fixture.xml');adb('shell','run-as',PKG,'mkdir','-p','shared_prefs');adb('shell','run-as',PKG,'cp','/data/local/tmp/fixture.xml','shared_prefs/reference_rates.xml')
 try:
@@ -75,8 +75,13 @@ try:
  choose('to_asset','metals_tab','Silver');check('250,000 troy oz of Silver')
  choose('from_asset','world_tab','Brazilian Real','BRL');choose('to_asset','world_tab','Philippine Peso','PHP');check('1,200.00 PHP')
  choose('from_asset','metals_tab','Palladium');choose('to_asset','metals_tab','Palladium');check('100 troy oz of Palladium')
- launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0.2' in ui();adb('shell','input','keyevent','4')
- adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0.2' in ui();adb('shell','input','keyevent','4')
+ choose('from_asset','crypto_tab','Bitcoin','BTC');choose('to_asset','crypto_tab','Satoshi (Bitcoin)','SAT');check('10,000,000,000 SAT');assert b'No rate lookup needed' in ui()
+ top();tap('swap');check('0.000001 BTC')
+ choose('from_asset','crypto_tab','XRP','XRP');choose('to_asset','crypto_tab','Drops (XRP)','DROP');check('100,000,000 DROP')
+ top();tap('swap');check('0.0001 XRP')
+ choose('from_asset','crypto_tab','Satoshi (Bitcoin)','SAT');choose('to_asset','crypto_tab','Drops (XRP)','DROP');check('50,000 DROP');assert b'Different reference dates' in ui()
+ launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0.3' in ui();adb('shell','input','keyevent','4')
+ adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0.3' in ui();adb('shell','input','keyevent','4')
  logs=adb('logcat','-d');(OUT/'logcat.txt').write_bytes(logs);assert b'FATAL EXCEPTION' not in logs
  print('ALL DEVICE CHECKS PASSED',flush=True)
  for name in ['home','metals-picker','crypto-picker','footer','large-picker','large-footer']:

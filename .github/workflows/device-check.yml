@@ -1,10 +1,10 @@
 name: Android 6 device check
 on:
   push:
-    branches: [version-4]
+    branches: [master]
     paths:
       - 'android-installer-file/Currency-Converter-4.0.2.apk'
-      - 'android-installer-file/Currency-Converter-4.0.1.apk'
+      - 'android-installer-file/Currency-Converter-4.0.3.apk'
       - 'scripts/android_smoke.py'
       - '.github/workflows/device-check.yml'
   workflow_dispatch:

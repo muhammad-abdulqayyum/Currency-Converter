@@ -16,3 +16,8 @@ https://www.naturalearthdata.com/about/terms-of-use/
 https://github.com/topojson/world-atlas
 
 Metal bars and Bitcoin coin are original canvas illustrations.
+
+
+## Crypto identification artwork (4.0.3)
+
+The small ETH, LTC and XRP identification icons are locally drawn vectors in `artwork/crypto/`, rendered into matching bundled images for Android and iOS. They depict the recognizable Ethereum diamond, Litecoin Ł, and community XRP X symbol. They identify conversion assets and do not imply endorsement. Reference materials: https://ethereum.org/en/assets/ , https://litecoin.com/resources , https://xrpl.org/docs/introduction/what-is-xrp . Subunit badges are app labels, not separate coin logos.
