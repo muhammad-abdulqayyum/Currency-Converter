@@ -1,0 +1,9 @@
+.build/
+.swiftpm/
+DerivedData/
+*.xcresult/
+UniversalCurrencyConverter.xcodeproj/
+Info.plist
+*.xcarchive/
+*.ipa
+build/

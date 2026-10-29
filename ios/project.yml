@@ -1,0 +1,52 @@
+name: UniversalCurrencyConverter
+options:
+  bundleIdPrefix: com.muhammadabdulqayyum
+  deploymentTarget:
+    iOS: '15.0'
+settings:
+  base:
+    SWIFT_VERSION: '5.0'
+    MARKETING_VERSION: '4.0.2'
+    CURRENT_PROJECT_VERSION: 42
+    IPHONEOS_DEPLOYMENT_TARGET: '15.0'
+    TARGETED_DEVICE_FAMILY: '1,2'
+    CODE_SIGN_STYLE: Automatic
+targets:
+  UniversalCurrencyConverter:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    resources: [Resources]
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: Universal Converter
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.muhammadabdulqayyum.universalconverter
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SUPPORTS_MACCATALYST: NO
+        SWIFT_EMIT_LOC_STRINGS: YES
+  ConverterUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: UniversalCurrencyConverter
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.muhammadabdulqayyum.universalconverter.uitests
+schemes:
+  UniversalCurrencyConverter:
+    build:
+      targets:
+        UniversalCurrencyConverter: all
+        ConverterUITests: [test]
+    test:
+      targets: [ConverterUITests]
+      gatherCoverageData: false

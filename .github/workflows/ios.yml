@@ -1,0 +1,53 @@
+name: iOS build and simulator checks
+on:
+  push:
+    branches: [master]
+    paths: ['ios/**', 'scripts/ios_simulator_check.py', '.github/workflows/ios.yml']
+  pull_request:
+    paths: ['ios/**', 'scripts/ios_simulator_check.py', '.github/workflows/ios.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select installed Xcode 26 or newer
+        run: |
+          python3 - <<'PY'
+          import pathlib,re,subprocess
+          apps=[]
+          for p in pathlib.Path('/Applications').glob('Xcode*.app'):
+              v=subprocess.check_output([str(p/'Contents/Developer/usr/bin/xcodebuild'),'-version'],text=True)
+              m=re.search(r'Xcode (\d+(?:\.\d+)*)',v)
+              if m and int(m[1].split('.')[0])>=26: apps.append((tuple(map(int,m[1].split('.'))),p))
+          if not apps: raise SystemExit('Xcode 26+ is required; update the runner image.')
+          p=max(apps,key=lambda x:x[0])[1]
+          subprocess.run(['sudo','xcode-select','-s',str(p/'Contents/Developer')],check=True)
+          PY
+          xcodebuild -version
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          cd ios
+          xcodegen generate
+      - name: Test decimal conversion, catalog, dates and cache policy
+        run: swift test --package-path ios
+      - name: Build iPhone and iPad simulator app and run UI tests
+        run: python3 scripts/ios_simulator_check.py
+      - name: Compile unsigned device Release
+        run: xcodebuild -project ios/UniversalCurrencyConverter.xcodeproj -scheme UniversalCurrencyConverter -configuration Release -destination 'generic/platform=iOS' -derivedDataPath ios/build/device CODE_SIGNING_ALLOWED=NO build > ios/build/device-build.log 2>&1
+      - name: Upload simulator app, screenshots and checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Universal-Currency-Converter-iOS-Simulator
+          path: |
+            ios/build/simulator/Build/Products/Debug-iphonesimulator/UniversalCurrencyConverter.app
+            ios/build/*.png
+            ios/build/*.json
+            ios/build/*.log
+            ios/build/*.xcresult
+            ios/UniversalCurrencyConverter.xcodeproj
