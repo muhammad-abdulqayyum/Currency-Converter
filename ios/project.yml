@@ -15,8 +15,7 @@ targets:
   UniversalCurrencyConverter:
     type: application
     platform: iOS
-    sources: [Sources]
-    resources: [Resources]
+    sources: [Sources, Resources]
     info:
       path: Info.plist
       properties:

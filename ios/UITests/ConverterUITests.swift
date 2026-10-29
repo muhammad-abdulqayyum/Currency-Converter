@@ -6,6 +6,8 @@ final class ConverterUITests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication(); app.launchArguments = ["-ui-testing", "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launch()
+        XCTAssertTrue(app.buttons["convert"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["convert"].isEnabled, "Bundled catalog must load before conversions are available")
     }
     private func tap(_ id: String) {
         // SwiftUI List exposes selection rows as cells on some iOS versions.
@@ -51,6 +53,10 @@ final class ConverterUITests: XCTestCase {
         XCTAssertEqual(swap.midX, from.midX, accuracy: 1)
         // Accessibility frames include the half-point outline around each card.
         XCTAssertGreaterThanOrEqual(swap.minY, from.maxY - 1); XCTAssertLessThanOrEqual(swap.maxY, to.minY + 1)
+        if app.frame.height >= 850 && app.frame.width < 768 {
+            XCTAssertTrue(app.buttons["about"].isHittable, "Default phone footer should fit without scrolling")
+            XCTAssertLessThanOrEqual(app.buttons["about"].frame.maxY, app.frame.maxY - 20)
+        }
         let screenshot = XCTAttachment(screenshot: app.screenshot()); screenshot.name = "iOS Home"; screenshot.lifetime = .keepAlways; add(screenshot)
         for _ in 0..<3 where !app.buttons["about"].isHittable { app.swipeUp() }
         tap("about"); XCTAssertTrue(app.staticTexts["Version 4.0.2 · iOS"].waitForExistence(timeout: 5))

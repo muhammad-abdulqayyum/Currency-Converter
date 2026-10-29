@@ -189,13 +189,15 @@ struct ConverterView: View {
                     Text("Built for humanity, with care.").font(.caption.weight(.bold)).foregroundColor(Theme.navy)
                     Text("Muhammad Hafiz Abdul-Qayyum").font(.caption2).foregroundColor(Theme.muted)
                 }.frame(maxWidth: .infinity, alignment: .leading)
-                if width >= 380 && !textSize.isAccessibilityCategory { aboutButton }
+                if width >= 350 && !textSize.isAccessibilityCategory { aboutButton }
             }
-            if width < 380 || textSize.isAccessibilityCategory { HStack { Spacer(); aboutButton } }
+            if width < 350 || textSize.isAccessibilityCategory { HStack { Spacer(); aboutButton } }
         }
     }
     private var aboutButton: some View {
-        Button("About & sources") { amountFocused = false; about = true }.font(.caption).foregroundColor(Theme.green)
-            .frame(minWidth: 96, minHeight: 44).accessibilityIdentifier("about")
+        Button { amountFocused = false; about = true } label: {
+            Text("About & sources").font(.caption).foregroundColor(Theme.green)
+                .frame(minWidth: 96, minHeight: 44).contentShape(Rectangle())
+        }.buttonStyle(.plain).accessibilityIdentifier("about")
     }
 }
