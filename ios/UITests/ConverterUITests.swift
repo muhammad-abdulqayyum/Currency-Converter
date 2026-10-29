@@ -54,4 +54,14 @@ final class ConverterUITests: XCTestCase {
         tap("about"); XCTAssertTrue(app.staticTexts["Version 4.0.2 · iOS"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Clinton Hill")).firstMatch.exists)
     }
+    func testLargeTextAndLandscapeFooter() {
+        app.terminate()
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]
+        app.launch()
+        XCUIDevice.shared.orientation = .landscapeLeft
+        defer { XCUIDevice.shared.orientation = .portrait }
+        for _ in 0..<8 where !app.buttons["about"].isHittable { app.swipeUp() }
+        tap("about")
+        XCTAssertTrue(app.staticTexts["Version 4.0.2 · iOS"].waitForExistence(timeout: 5))
+    }
 }

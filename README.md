@@ -4,6 +4,10 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 
 **[Download Version 4.0.2](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.2.apk)** · Android 6.0+ · debug-signed preview.
 
+## iPhone and iPad
+
+A native Swift/SwiftUI version is included in [`ios/`](ios/README.md), targeting iOS/iPadOS 15.0 and later, with the same 165 assets and independent pickers. See the [iOS build and simulator checks](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/ios.yml) for validation. TestFlight/App Store distribution requires Apple signing and your developer account; the Android APK does not run on iOS.
+
 ## Version 4.0.2
 
 The default screen uses a compact header, a compact circular Swap centered between From and To, and a footer with the heritage flag on the left, the full author credit beside it, and About on the right. Spare vertical space places the footer at the bottom. Narrow screens or larger text move About below the credit and allow natural scrolling.
