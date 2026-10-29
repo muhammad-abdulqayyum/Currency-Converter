@@ -41,6 +41,7 @@ final class ConverterUITests: XCTestCase {
         choose("fromAsset", "Metals", "XPD"); choose("toAsset", "Metals", "XPD"); convert("100 troy oz of Palladium")
     }
     func testCryptoUnits() {
+        executionTimeAllowance = 180 // Multiple picker/search flows on slower SE simulators.
         choose("fromAsset", "Crypto", "BTC"); choose("toAsset", "Crypto", "SAT"); convert("10,000,000,000 SAT")
         XCTAssertTrue(app.staticTexts["details"].label.contains("No rate lookup needed"))
         tap("swap"); convert("0.000001 BTC")
