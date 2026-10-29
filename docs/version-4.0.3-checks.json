@@ -11,15 +11,29 @@
   "sha256": "8cc8918005c5e8d22e599bb3b175cb78040723d34e1db2d3e2d61f982b4099ad",
   "signerSha256": "648d41550ab8f7b9b34618551fd3002199f0e2bc1bb4d792d4f20712d2f85c93",
   "androidSourceWorkflow": 40970162409,
-  "iosWorkflow": 40970162515,
+  "iosWorkflow": 40972616476,
   "androidDeviceWorkflow": 40971150766,
   "androidUnitTests": 46,
   "iosCoreTests": 14,
   "sourceBuilds": "passed",
-  "deviceChecks": "Android passed; iOS pending",
+  "deviceChecks": "Android passed; iOS partial",
   "androidDeviceChecks": "passed",
   "androidUpgradeFrom": "4.0.2: passed",
   "androidDefaultFit": "420x900: passed",
   "androidLargeTextFooter": "360x800 at 1.3: passed",
-  "iosDeviceChecks": "pending"
+  "iosDeviceChecks": "Main iPhone passed; full small-phone/iPad recheck blocked by simulator boot timeout",
+  "iosUiTestsPerDevice": {
+    "phone": 5,
+    "small-phone": 3,
+    "ipad": 3
+  },
+  "iosPhoneUiWorkflow": 40970162515,
+  "iosMainPhoneTests": 5,
+  "iosMainPhoneFailures": 0,
+  "iosSmallPhoneLayout": "passed in first workflow",
+  "iosSmallPhoneNewUnitFlow": "initial two-minute test allowance exceeded; 180-second adjustment not revalidated due simulator startup failures",
+  "iosIpadNewVersionUi": "not completed",
+  "iosLatestAttempt": 2,
+  "iosLatestJob": 123795590941,
+  "iosFullMatrix": "incomplete: simulator bootstatus exceeded 240 seconds before app launch on both retry attempts"
 }

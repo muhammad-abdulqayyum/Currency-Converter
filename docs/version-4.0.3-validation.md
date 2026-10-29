@@ -20,10 +20,18 @@ Android version code 43 uses the existing 4.x preview certificate and should upd
 
 ## Checks
 
-Android: **passed** (46 core tests, lint/build, signed APK upgrade, all device flows). iOS: core tests and both builds passed; simulator interaction checks are pending.
+Android: **passed** (46 core tests, lint/build, signed APK upgrade, all device flows). iOS: **14 core tests and Debug/Release compilation passed**; all five main iPhone 17 interaction tests passed in the first workflow. Full small-phone/iPad revalidation is **incomplete**, as detailed below.
 
 - Android source tests, lint and assembly: https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/40970162409
 - Signed APK upgrade and device checks: https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/40971150766
-- iOS core tests, Debug/Release compilation and simulator checks: https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/40970162515
+- iOS core tests, Debug/Release compilation and simulator checks: https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/40972616476
 
 The added core checks exercise exact denomination ratios in both directions, single-unit precision, cross-subunit market conversion, whole-unit rounding and parent-cache derivation. Device/simulator flows exercise both new selections, swaps, cross-subunit results, source/date disclosure and existing layouts. Android uses a dedicated API 23 emulator with synthetic local fixtures; iOS Debug uses injected fixtures compiled out of Release. No synthetic conversion prices are used in published initial-screen screenshots. An iOS 15 physical device is not part of the CI simulator matrix.
+
+The new multi-step iOS unit flow has a 180-second allowance for slower small-phone simulator interaction. All conversion logic is unchanged by this test timing adjustment. The full phone suite is supplemented by layout, large-text/landscape and new-unit flows on the smaller phone and iPad.
+
+## iOS verification limit
+
+The application-source workflow https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/40970162515 passed all five iPhone 17 tests, including new denominations, and produced the real main-phone screenshot. On iPhone SE, the multi-step unit flow reached its original two-minute execution allowance; the two layout/accessibility checks passed. The test's allowance was raised to 180 seconds without changing app code.
+
+The adjusted workflow https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/40972616476 and its automatic job retry both passed core tests and simulator/device compilation but stopped before interface tests because `simctl bootstatus` exceeded the 240-second startup limit. These are simulator-startup failures, not observed app crashes. The adjusted small-phone unit flow and the iPad matrix therefore remain unverified for this patch. No complete three-device passing result is claimed. Apple signing and physical iOS 15 validation remain separate release steps.

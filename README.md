@@ -67,6 +67,8 @@ Minimum Android 6.0/API 23; compile/target SDK 35. Play publishing needs a produ
 
 ## Preview
 
+[iPhone 4.0.3 screen](docs/screenshots/ios-v403-phone.png) · [Platform verification and remaining iOS simulator limit](docs/version-4.0.3-validation.md)
+
 ![Version 4 main screen](docs/screenshots/v403-home.png)
 
 ![Metals picker](docs/screenshots/v403-metals-picker.png)
