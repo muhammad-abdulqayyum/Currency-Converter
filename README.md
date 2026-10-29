@@ -1,12 +1,20 @@
-# Universal Currency Converter · Version 3
+# Universal Currency Converter · Version 3.1
 
-A lightweight Android reference converter by **Muhammad Hafiz Abdul-Qayyum**, Clinton Hill, Brooklyn, NYC. Built for humanity, with care.
+A lightweight Android reference converter by **Muhammad Hafiz Abdul-Qayyum**, Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
 Enter a USD amount, choose **World Currencies**, **Metals**, or **Crypto**, select an asset from the dropdown, and tap **Convert USD**.
 
-**[Download the Version 3 preview APK](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter.apk)** · Android 6.0+ · debug-signed preview. See signing notes below if upgrading from a previous debug build.
+**[Download the Version 3.1 preview APK](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter.apk)** · Android 6.0+ · debug-signed preview. See signing notes below if upgrading from a previous debug build.
 
-## Version 3
+## Version 3.1
+
+- Static Americas-centered geographic globe, stacked gold/silver bars and a gold Bitcoin coin.
+- Bundled Black American Heritage Flag beside the author credit.
+- Author location: From Clinton Hill, Brooklyn, New York City, USA.
+- Category icons are bundled and rendered locally; no extra API or runtime dependencies.
+- See [illustration credits](THIRD_PARTY_NOTICES.md).
+
+## Conversion features
 
 - **155 world currencies:** current national, shared and territorial currencies in the verified bundled catalog, with flag/region symbols, codes and names.
 - **Four precious metals:** gold (XAU), silver (XAG), platinum (XPT) and palladium (XPD), in **troy ounces** (31.1034768 grams).
@@ -21,9 +29,10 @@ Enter a USD amount, choose **World Currencies**, **Metals**, or **Crypto**, sele
 
 ## Validation
 
+- Version 3.1 installed and launched on Android 6/API 23. Checked all three categories, the heritage flag footer and About credit; the keyboard stays closed on launch.
 - 21 JVM unit tests passed; Android lint completed without errors.
-- Debug APK measured 68,707 bytes (about 67 KiB).
-- Installed and launched on an Android 6.0/API 23 emulator. Exercised GBP, gold and BTC conversion screens with validated live-feed snapshots seeded into the local cache, and checked a narrow screen with enlarged text. No runtime crash was observed.
+- Version 3.1 debug APK measured 90,799 bytes.
+- Earlier Version 3.0 validation: installed and launched on an Android 6.0/API 23 emulator. Exercised GBP, gold and BTC conversion screens with validated live-feed snapshots seeded into the local cache, and checked a narrow screen with enlarged text. No runtime crash was observed.
 - The separate live-feed check validated all 164 USD pairs. The emulator smoke check does not establish end-to-end network behavior on every supported phone.
 
 ## Rates and coverage

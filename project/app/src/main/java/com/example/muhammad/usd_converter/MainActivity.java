@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
     private Spinner currency;
     private TextView result, status, note, count, resultLabel;
     private Button convert;
-    private final Button[] tabs = new Button[3];
+    private final View[] tabs = new View[3];
     private ProgressBar progress;
     private RateRepository repository;
     private int section;
@@ -46,6 +46,9 @@ public class MainActivity extends Activity {
         convert = findViewById(R.id.convert); progress = findViewById(R.id.progress);
         tabs[0] = findViewById(R.id.world_tab); tabs[1] = findViewById(R.id.metals_tab);
         tabs[2] = findViewById(R.id.crypto_tab);
+        ((CategoryIconView)findViewById(R.id.world_icon)).setKind(0);
+        ((CategoryIconView)findViewById(R.id.metals_icon)).setKind(1);
+        ((CategoryIconView)findViewById(R.id.crypto_icon)).setKind(2);
         repository = new RateRepository(getSharedPreferences("reference_rates", MODE_PRIVATE));
         try { loadAssets(); }
         catch (Exception e) {
@@ -91,7 +94,7 @@ public class MainActivity extends Activity {
         if (loading) return;
         section = Math.max(0, Math.min(2, target));
         for (int i = 0; i < 3; i++) { tabs[i].setSelected(i == section); tabs[i].setContentDescription(
-                tabs[i].getText() + (i == section ? ", selected" : "")); }
+                getString(new int[]{R.string.world_tab, R.string.metals_tab, R.string.crypto_tab}[i]) + (i == section ? ", selected" : "")); }
         ArrayAdapter<Asset> adapter = new ArrayAdapter<>(this, R.layout.asset_selected, groups.get(section));
         adapter.setDropDownViewResource(R.layout.asset_row);
         currency.setAdapter(adapter);
@@ -113,7 +116,7 @@ public class MainActivity extends Activity {
     }
     private void busy(boolean value) {
         loading = value; convert.setEnabled(!value); currency.setEnabled(!value); amount.setEnabled(!value);
-        for (Button tab : tabs) tab.setEnabled(!value);
+        for (View tab : tabs) tab.setEnabled(!value);
         progress.setVisibility(value ? View.VISIBLE : View.GONE);
     }
     private void convert() {
