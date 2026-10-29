@@ -18,8 +18,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - run: gradle -p project testDebugUnitTest assembleDebug
+      - run: gradle -p project testDebugUnitTest lintDebug assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: Currency-Converter-debug
+          name: Universal-Currency-Converter-v3-debug
           path: project/app/build/outputs/apk/debug/app-debug.apk

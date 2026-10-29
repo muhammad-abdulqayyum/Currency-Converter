@@ -1,15 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/activity_main" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="#F5F1E8">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/activity_main" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="@color/canvas">
 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
-<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="CURRENCY CONVERTER" android:textColor="#16745F" android:textSize="12sp" android:letterSpacing="0.12" android:layout_marginTop="24dp" />
-<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="A world of possibilities." android:textSize="34sp" android:textColor="#101E2B" android:layout_marginTop="16dp" />
-<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Convert U.S. dollars with the latest available daily reference rates." android:textSize="16sp" android:layout_marginTop="16dp" android:textColor="#516675" />
-<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:labelFor="@id/editText" android:text="Amount in USD" android:layout_marginTop="32dp" />
-<EditText android:id="@+id/editText" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:hint="100.00" android:textSize="28sp" android:singleLine="true" android:maxLength="18" />
-<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:labelFor="@id/currency" android:text="Convert to" android:layout_marginTop="20dp" />
-<Spinner android:id="@+id/currency" android:layout_width="match_parent" android:layout_height="56dp" />
-<Button android:id="@+id/convert" android:layout_width="match_parent" android:layout_height="56dp" android:text="Convert currency" android:layout_marginTop="20dp" />
-<ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:indeterminate="true" android:visibility="gone" />
-<TextView android:id="@+id/result" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Your conversion appears here" android:textSize="28sp" android:textColor="#101E2B" android:layout_marginTop="28dp" android:accessibilityLiveRegion="polite" android:textIsSelectable="true" />
-<TextView android:id="@+id/status" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Rates provided by Frankfurter. Reference rates may differ from bank or card rates." android:textColor="#516675" android:textSize="14sp" android:layout_marginTop="16dp" android:accessibilityLiveRegion="polite" />
-</LinearLayout></ScrollView>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="12dp" android:orientation="horizontal">
+        <ImageView android:layout_width="56dp" android:layout_height="56dp" android:src="@drawable/universal_emblem" android:importantForAccessibility="no"/>
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:text="@string/brand" android:textColor="@color/navy" android:textSize="14sp" android:textStyle="bold" android:letterSpacing="0.06"/>
+    </LinearLayout>
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/eyebrow" android:textColor="@color/red" android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.10" android:layout_marginTop="26dp"/>
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/headline" android:textSize="30sp" android:textColor="@color/navy" android:layout_marginTop="8dp"/>
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/subtitle" android:textSize="15sp" android:textColor="@color/muted" android:layout_marginTop="8dp"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/card" android:padding="18dp" android:layout_marginTop="24dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:labelFor="@id/editText" android:text="@string/amount_label" android:textColor="@color/muted" android:textSize="14sp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/usd_label" android:textColor="@color/navy" android:textStyle="bold" android:textSize="16sp" android:layout_marginEnd="12dp"/>
+            <EditText android:id="@+id/editText" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="60dp" android:inputType="numberDecimal" android:hint="@string/amount_hint" android:textSize="28sp" android:textColor="@color/navy" android:textColorHint="#687585" android:singleLine="true" android:maxLength="18" android:imeOptions="actionDone"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:orientation="horizontal">
+        <Button android:id="@+id/world_tab" android:layout_width="0dp" android:layout_weight="1" android:layout_height="64dp" android:background="@drawable/tab" android:text="@string/world_tab" android:textAllCaps="false" android:textSize="13sp" android:textColor="@color/tab_text" android:padding="4dp"/>
+        <Button android:id="@+id/metals_tab" android:layout_width="0dp" android:layout_weight="1" android:layout_height="64dp" android:layout_marginStart="8dp" android:background="@drawable/tab" android:text="@string/metals_tab" android:textAllCaps="false" android:textSize="13sp" android:textColor="@color/tab_text" android:padding="4dp"/>
+        <Button android:id="@+id/crypto_tab" android:layout_width="0dp" android:layout_weight="1" android:layout_height="64dp" android:layout_marginStart="8dp" android:background="@drawable/tab" android:text="@string/crypto_tab" android:textAllCaps="false" android:textSize="13sp" android:textColor="@color/tab_text" android:padding="4dp"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/card" android:padding="16dp" android:layout_marginTop="14dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+            <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:labelFor="@id/currency" android:text="@string/asset_label" android:textColor="@color/muted" android:textSize="13sp"/>
+            <TextView android:id="@+id/asset_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/muted" android:textSize="12sp"/>
+        </LinearLayout>
+        <Spinner android:id="@+id/currency" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:spinnerMode="dropdown" android:popupBackground="@drawable/card"/>
+    </LinearLayout>
+    <TextView android:id="@+id/section_note" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:textColor="@color/muted" android:textSize="12sp"/>
+    <Button android:id="@+id/convert" android:layout_width="match_parent" android:layout_height="56dp" android:background="@drawable/convert_button" android:text="@string/convert" android:textAllCaps="false" android:textColor="#FFFFFF" android:textSize="17sp" android:layout_marginTop="18dp"/>
+    <ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="gone" android:layout_marginTop="10dp"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/result_card" android:padding="20dp" android:layout_marginTop="20dp">
+        <TextView android:id="@+id/result_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/result_label" android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.08" android:textColor="@color/green"/>
+        <TextView android:id="@+id/result" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/result_placeholder" android:textSize="27sp" android:textColor="@color/navy" android:layout_marginTop="12dp" android:accessibilityLiveRegion="polite" android:textIsSelectable="true"/>
+        <TextView android:id="@+id/status" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/ready_status" android:textColor="@color/muted" android:textSize="13sp" android:layout_marginTop="14dp" android:accessibilityLiveRegion="polite"/>
+    </LinearLayout>
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/footer" android:textColor="@color/muted" android:textSize="12sp" android:gravity="center" android:lineSpacingExtra="4dp" android:layout_marginTop="26dp"/>
+    <Button android:id="@+id/about" style="?android:attr/borderlessButtonStyle" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/about_button" android:textAllCaps="false" android:textSize="13sp" android:textColor="@color/green"/>
+</LinearLayout>
+</ScrollView>

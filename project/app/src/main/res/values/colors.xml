@@ -1,6 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="canvas">#F7F3EC</color>
+    <color name="navy">#162A43</color>
+    <color name="muted">#536477</color>
+    <color name="red">#A82F3D</color>
+    <color name="green">#17654C</color>
+    <color name="gold">#DDAE54</color>
 </resources>

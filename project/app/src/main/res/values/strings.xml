@@ -1,3 +1,31 @@
 <resources>
-    <string name="app_name">USD-Converter</string>
+    <string name="app_name">Universal Currency Converter</string>
+    <string name="brand">UNIVERSAL\nCURRENCY CONVERTER</string>
+    <string name="eyebrow">VERSION 3 · FOR HUMANITY</string>
+    <string name="headline">A world within reach.</string>
+    <string name="subtitle">One amount. A world of possibilities.</string>
+    <string name="amount_label">Amount in US dollars</string>
+    <string name="usd_label">🇺🇸  USD</string>
+    <string name="amount_hint">100.00</string>
+    <string name="world_tab">World\nCurrencies</string>
+    <string name="metals_tab">Metals</string>
+    <string name="crypto_tab">Crypto</string>
+    <string name="asset_label">Convert to</string>
+    <string name="asset_count">%1$d options</string>
+    <string name="world_note">Daily reference rates. Local cash and bank rates may differ.</string>
+    <string name="metals_note">Metal amounts are in troy ounces (31.1034768 g). Reference values exclude dealer premiums.</string>
+    <string name="crypto_note">Swiss weekday reference values, not live crypto prices. Rate dates are shown below.</string>
+    <string name="convert">Convert USD</string>
+    <string name="result_label">YOUR CONVERSION</string>
+    <string name="result_placeholder">Your world, in numbers.</string>
+    <string name="ready_status">Choose an asset and tap Convert. Every rate has a date.</string>
+    <string name="fetching">Getting your rate…</string>
+    <string name="connecting">Checking a recent reference rate…</string>
+    <string name="unavailable">Rate unavailable</string>
+    <string name="unavailable_detail">No valid reference rate from the last seven days is available. Check your connection and try again. No price was invented.</string>
+    <string name="catalog_error">The asset list could not be loaded. Please reinstall the app.</string>
+    <string name="amount_error">Enter a USD amount from 0 to 1 trillion, with up to two decimal places. Use a decimal point, without commas.</string>
+    <string name="footer">Built for humanity, with care.\nMuhammad Hafiz Abdul-Qayyum</string>
+    <string name="about_button">About &amp; sources</string>
+    <string name="about_text">Version 3.0\n\nCreated by Muhammad Hafiz Abdul-Qayyum\nClinton Hill, Brooklyn, New York City\n\n“From your Brother Muhammad Hafiz Abdul-Qayyum in the Wilderness of North America.”\n\nFor humanity. If Allah wills.\n\nThe original sun, crescent and star emblem celebrates light, possibility and connection.\n\nData: Frankfurter and its official-source providers. Cryptocurrency reference values: Swiss Federal Tax Administration (ESTV). These are dated reference conversions, not executable trading quotes.\n\nMetals: troy ounces. Crypto: units of each coin. National and shared currencies use their currency codes; flags identify currencies and are not a statement about sovereignty.\n\nOnly fetched rate snapshots are cached on this device. Fresh snapshots may be reused for six hours. If a request fails, a saved rate may be shown for up to seven days, clearly labeled. Amounts and conversion history are not saved. No ads or analytics SDKs are included.</string>
 </resources>
