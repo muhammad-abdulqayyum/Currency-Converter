@@ -1,0 +1,40 @@
+name: Android 6 device check
+on:
+  push:
+    branches: [version-4]
+    paths:
+      - 'android-installer-file/Currency-Converter-4.0.apk'
+      - 'scripts/android_smoke.py'
+      - '.github/workflows/device-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Test packaged APK
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 23
+          target: default
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          script: python3 scripts/android_smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Android-6-device-checks
+          path: device-checks/
