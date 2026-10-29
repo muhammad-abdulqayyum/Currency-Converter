@@ -1,0 +1,12 @@
+{
+  "version": "4.0",
+  "versionCode": 40,
+  "apkBytes": 102754,
+  "sha256": "4b84cd51de7a0c06ce007f520276170ab4a0f5990534b08c6db4a1fa0f856fd7",
+  "unitTests": 36,
+  "unitFailures": 0,
+  "lintErrors": 0,
+  "liveFeedPairsValidated": 164,
+  "selectableAssets": 165,
+  "signerSha256": "648d41550ab8f7b9b34618551fd3002199f0e2bc1bb4d792d4f20712d2f85c93"
+}
