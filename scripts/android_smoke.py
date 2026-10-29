@@ -20,6 +20,16 @@ def tap(key,text=False):
    if y2>y1:
     adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2));time.sleep(.3);return
  raise AssertionError('Missing UI element '+key)
+def check_fit():
+ nodes=list(ET.fromstring(ui()).iter('node'))
+ def bounds(n):return list(map(int,re.findall(r'\d+',n.get('bounds'))))
+ root=next(n for n in nodes if n.get('resource-id','').endswith('/activity_main'))
+ about=next(n for n in nodes if n.get('resource-id','').endswith('/about'))
+ flag=next(n for n in nodes if n.get('content-desc')=='Black American Heritage Flag')
+ rb,ab,fb=bounds(root),bounds(about),bounds(flag)
+ assert ab[3]-ab[1]>=48 and rb[3]-ab[3]>=8,(rb,ab)
+ assert fb[3]-fb[1]>=35 and fb[2]-fb[0]>=52,fb
+ print('PASS: one-screen default layout '+str(rb),flush=True)
 def shot(name):
  (OUT/(name+'.png')).write_bytes(adb('exec-out','screencap','-p'))
  (OUT/(name+'.xml')).write_bytes(ui())
@@ -39,6 +49,8 @@ def launch():
 serial=adb('get-serialno').decode().strip()
 assert serial.startswith('emulator-'),'Use a dedicated emulator only'
 adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.apk'))
+adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.1.apk'))
+print('PASS: upgrade 4.0 to 4.0.1',flush=True)
 adb('shell','wm','size','420x900');adb('shell','wm','density','160');adb('shell','input','keyevent','82');adb('logcat','-c')
 now=int(time.time()*1000);day=datetime.datetime.now(datetime.timezone.utc).date();prefs=['<map>']
 for code,rate in {'GBP':'0.8','BRL':'5','PHP':'60','XAU':'0.00025','XAG':'0.025','BTC':'0.00001'}.items():
@@ -47,7 +59,7 @@ for code,rate in {'GBP':'0.8','BRL':'5','PHP':'60','XAU':'0.00025','XAG':'0.025'
  prefs.append('<string name="v3.'+code+'">'+esc.escape(body)+'</string><long name="v3.'+code+'.time" value="'+str(now)+'"/>')
 prefs.append('</map>');(OUT/'fixture.xml').write_text(''.join(prefs));adb('push',str(OUT/'fixture.xml'),'/data/local/tmp/fixture.xml');adb('shell','run-as',PKG,'mkdir','-p','shared_prefs');adb('shell','run-as',PKG,'cp','/data/local/tmp/fixture.xml','shared_prefs/reference_rates.xml')
 try:
- launch();time.sleep(4);shot('home');assert b'VERSION 4' in ui()
+ launch();time.sleep(4);shot('home');assert b'VERSION 4' in ui();check_fit()
  top();tap('from_asset');tap('metals_tab');shot('metals-picker');tap('Gold',True)
  choose('to_asset','world_tab','US Dollar','USD');check('400,000.00 USD')
  top();tap('swap');check('0.025 troy oz of Gold')
@@ -55,8 +67,8 @@ try:
  choose('to_asset','metals_tab','Silver');check('250,000 troy oz of Silver')
  choose('from_asset','world_tab','Brazilian Real','BRL');choose('to_asset','world_tab','Philippine Peso','PHP');check('1,200.00 PHP')
  choose('from_asset','metals_tab','Palladium');choose('to_asset','metals_tab','Palladium');check('100 troy oz of Palladium')
- launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0' in ui();adb('shell','input','keyevent','4')
- adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0' in ui();adb('shell','input','keyevent','4')
+ launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0.1' in ui();adb('shell','input','keyevent','4')
+ adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0.1' in ui();adb('shell','input','keyevent','4')
  logs=adb('logcat','-d');(OUT/'logcat.txt').write_bytes(logs);assert b'FATAL EXCEPTION' not in logs
  print('ALL DEVICE CHECKS PASSED',flush=True)
  for name in ['home','metals-picker','crypto-picker','footer','large-picker','large-footer']:
