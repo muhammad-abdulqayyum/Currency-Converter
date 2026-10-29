@@ -15,7 +15,7 @@ def ui():
 
 def tap(key,text=False):
  for n in ET.fromstring(ui()).iter('node'):
-  if (n.get('text')==key if text else n.get('resource-id','').endswith('/'+key)):
+  if (n.get('text')==key and n.get('class')!='android.widget.EditText' if text else n.get('resource-id','').endswith('/'+key)):
    x1,y1,x2,y2=map(int,re.findall(r'\d+',n.get('bounds')))
    if y2>y1:
     adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2));time.sleep(.3);return
