@@ -96,6 +96,23 @@ struct ConverterView: View {
                     Text("A world within reach.").font(.system(.title, design: .serif)).foregroundColor(Theme.navy).padding(.top, 14)
                     Text("World currencies, metals and crypto.").font(.subheadline).foregroundColor(Theme.muted).padding(.top, 4)
                     amountCard.padding(.top, 16)
+                    currencyPair
+                    if !model.note.isEmpty { Text(model.note).font(.footnote).foregroundColor(Theme.muted).padding(.top, 8) }
+                    if let error = model.error { Text(error).font(.footnote).foregroundColor(.red).accessibilityIdentifier("inputError").padding(.top, 8) }
+                    convertButton
+                    resultCard
+                    Spacer(minLength: 24)
+                    footer(width: geometry.size.width - 40)
+                }.frame(maxWidth: 580).padding(.horizontal, 20).padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, minHeight: geometry.size.height, alignment: .top)
+            }.background(Theme.cream.ignoresSafeArea())
+        }.sheet(item: $picker) { side in
+            AssetPicker(assets: model.assets, chosen: side.source ? model.from : model.to, source: side.source) { model.select($0, source: side.source) }
+        }.sheet(isPresented: $about) { AboutView() }
+            .onChange(of: model.amount) { _ in model.clear() }
+    }
+    private var currencyPair: some View {
+        VStack(alignment: .leading, spacing: 0) {
                     Text("From").font(.subheadline).foregroundColor(Theme.muted).padding(.top, 16).padding(.bottom, 5)
                     assetButton(model.from, source: true)
                     ZStack(alignment: .bottomLeading) {
@@ -113,26 +130,20 @@ struct ConverterView: View {
                         }
                     }.frame(minHeight: 48).padding(.bottom, 5)
                     assetButton(model.to, source: false)
-                    if !model.note.isEmpty { Text(model.note).font(.footnote).foregroundColor(Theme.muted).padding(.top, 8) }
-                    if let error = model.error { Text(error).font(.footnote).foregroundColor(.red).accessibilityIdentifier("inputError").padding(.top, 8) }
+        }
+    }
+    private var convertButton: some View {
                     Button { amountFocused = false; model.convert() } label: {
                         HStack { Spacer(); if model.loading { ProgressView().tint(.white) }; Text(model.loading ? "Checking…" : "Convert"); Spacer() }
                             .font(.headline).foregroundColor(.white).padding(.vertical, 15).frame(minHeight: 52).background(Theme.navy).cornerRadius(16)
                     }.buttonStyle(.plain).disabled(model.loading || model.assets.isEmpty).accessibilityIdentifier("convert").padding(.top, 14)
+    }
+    private var resultCard: some View {
                     VStack(alignment: .leading, spacing: 7) {
                         Text("YOUR CONVERSION").font(.caption).foregroundColor(Theme.green)
                         Text(model.result).font(.system(.title2, design: .serif)).foregroundColor(Theme.navy).textSelection(.enabled).accessibilityIdentifier("result")
                         Text(model.details).font(.footnote).foregroundColor(Theme.muted).textSelection(.enabled).accessibilityIdentifier("details")
                     }.frame(maxWidth: .infinity, alignment: .leading).padding(16).background(Theme.result).cornerRadius(16).padding(.top, 14)
-                    Spacer(minLength: 24)
-                    footer(width: geometry.size.width - 40)
-                }.frame(maxWidth: 580).padding(.horizontal, 20).padding(.vertical, 12)
-                    .frame(maxWidth: .infinity, minHeight: geometry.size.height, alignment: .top)
-            }.background(Theme.cream.ignoresSafeArea())
-        }.sheet(item: $picker) { side in
-            AssetPicker(assets: model.assets, chosen: side.source ? model.from : model.to, source: side.source) { model.select($0, source: side.source) }
-        }.sheet(isPresented: $about) { AboutView() }
-            .onChange(of: model.amount) { _ in model.clear() }
     }
     private var header: some View {
         HStack(spacing: 12) {

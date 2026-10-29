@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """Build and test the real iOS app on the available Apple-hosted simulators."""
-import base64,json,pathlib,subprocess,time
+import base64,json,pathlib,subprocess,time,sys,platform
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/'ios/build';OUT.mkdir(exist_ok=True)
 def run(*args):
  return subprocess.check_output(args,text=True)
-def xcode(*args,log):
+def xcode(*args,log,timeout=600):
+ print('START: '+log,flush=True)
  with (OUT/log).open('w') as stream:
-  result=subprocess.run(['xcodebuild','-project',str(ROOT/'ios/UniversalCurrencyConverter.xcodeproj'),'-scheme','UniversalCurrencyConverter',
-    '-derivedDataPath',str(OUT/'simulator'),'CODE_SIGNING_ALLOWED=NO',*args],stdout=stream,stderr=subprocess.STDOUT)
+  try:
+   result=subprocess.run(['xcodebuild','-project',str(ROOT/'ios/UniversalCurrencyConverter.xcodeproj'),'-scheme','UniversalCurrencyConverter',
+    '-derivedDataPath',str(OUT/'simulator'),'CODE_SIGNING_ALLOWED=NO','ARCHS='+platform.machine(),*args],stdout=stream,stderr=subprocess.STDOUT,timeout=timeout)
+  except subprocess.TimeoutExpired:
+   print((OUT/log).read_text()[-20000:],flush=True);raise
  if result.returncode:
   print((OUT/log).read_text()[-16000:],flush=True);raise SystemExit(result.returncode)
 devices=json.loads(run('xcrun','simctl','list','devices','available','--json'))['devices']
@@ -26,13 +30,17 @@ for label,device in [('phone',large),('small-phone',small),('ipad',tablet)]:
  if device['udid'] in [x[1]['udid'] for x in matrix]:continue
  matrix.append((label,device))
 print('Simulator matrix:',[(label,d['name']) for label,d in matrix],flush=True)
-xcode('-destination','generic/platform=iOS Simulator','build-for-testing',log='simulator-build.log')
+if '--test-only' not in sys.argv:
+ xcode('-destination','generic/platform=iOS Simulator','build-for-testing',log='simulator-build.log')
+ print('PASS: simulator compilation',flush=True)
+if '--build-only' in sys.argv:raise SystemExit(0)
 for label,device in matrix:
  udid=device['udid'];subprocess.run(['xcrun','simctl','shutdown','all'],check=False)
  subprocess.run(['xcrun','simctl','boot',udid],check=True)
- subprocess.run(['xcrun','simctl','bootstatus',udid,'-b'],check=True)
- xcode('-destination','id='+udid,'-parallel-testing-enabled','NO','-resultBundlePath',str(OUT/(label+'.xcresult')),
-       'test-without-building',log=label+'-tests.log')
+ subprocess.run(['xcrun','simctl','bootstatus',udid,'-b'],check=True,timeout=240)
+ xcode('-destination','id='+udid,'-parallel-testing-enabled','NO','-test-timeouts-enabled','YES',
+       '-default-test-execution-time-allowance','120','-maximum-test-execution-time-allowance','180',
+       '-resultBundlePath',str(OUT/(label+'.xcresult')),'test-without-building',log=label+'-tests.log',timeout=480)
  # A clean initial screen has no synthetic conversion prices in its screenshot.
  app=OUT/'simulator/Build/Products/Debug-iphonesimulator/UniversalCurrencyConverter.app'
  subprocess.run(['xcrun','simctl','install',udid,str(app)],check=True)
