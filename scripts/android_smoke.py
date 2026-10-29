@@ -24,7 +24,7 @@ def shot(name):
  (OUT/(name+'.png')).write_bytes(adb('exec-out','screencap','-p'))
  (OUT/(name+'.xml')).write_bytes(ui())
 def top():adb('shell','input','swipe','200','200','200','830','200')
-def bottom():adb('shell','input','swipe','200','800','200','150','200')
+def bottom():adb('shell','input','swipe','200','700','200','150','200')
 def choose(side,category,name,query=None):
  top();tap(side);tap(category)
  if query:
@@ -56,7 +56,7 @@ try:
  choose('from_asset','world_tab','Brazilian Real','BRL');choose('to_asset','world_tab','Philippine Peso','PHP');check('1,200.00 PHP')
  choose('from_asset','metals_tab','Palladium');choose('to_asset','metals_tab','Palladium');check('100 troy oz of Palladium')
  launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0' in ui();adb('shell','input','keyevent','4')
- adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer')
+ adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0' in ui();adb('shell','input','keyevent','4')
  logs=adb('logcat','-d');(OUT/'logcat.txt').write_bytes(logs);assert b'FATAL EXCEPTION' not in logs
  print('ALL DEVICE CHECKS PASSED',flush=True)
  for name in ['home','metals-picker','crypto-picker','footer','large-picker','large-footer']:
