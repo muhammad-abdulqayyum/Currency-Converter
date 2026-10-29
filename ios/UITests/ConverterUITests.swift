@@ -8,8 +8,9 @@ final class ConverterUITests: XCTestCase {
         app.launch()
     }
     private func tap(_ id: String) {
-        let button = app.buttons[id]
-        XCTAssertTrue(button.waitForExistence(timeout: 8), "Missing \(id)")
+        // SwiftUI List exposes selection rows as cells on some iOS versions.
+        let button = app.descendants(matching: .any).matching(identifier: id).firstMatch
+        if !button.waitForExistence(timeout: 8) { print(app.debugDescription); XCTFail("Missing \(id)"); return }
         if !button.isHittable {
             if ["swap", "fromAsset", "toAsset"].contains(id) { app.swipeDown() } else { app.swipeUp() }
         }
@@ -48,7 +49,8 @@ final class ConverterUITests: XCTestCase {
         let from = app.buttons["fromAsset"].frame, to = app.buttons["toAsset"].frame, swap = app.buttons["swap"].frame
         XCTAssertGreaterThanOrEqual(swap.width, 44); XCTAssertGreaterThanOrEqual(swap.height, 44)
         XCTAssertEqual(swap.midX, from.midX, accuracy: 1)
-        XCTAssertGreaterThanOrEqual(swap.minY, from.maxY); XCTAssertLessThanOrEqual(swap.maxY, to.minY)
+        // Accessibility frames include the half-point outline around each card.
+        XCTAssertGreaterThanOrEqual(swap.minY, from.maxY - 1); XCTAssertLessThanOrEqual(swap.maxY, to.minY + 1)
         let screenshot = XCTAttachment(screenshot: app.screenshot()); screenshot.name = "iOS Home"; screenshot.lifetime = .keepAlways; add(screenshot)
         for _ in 0..<3 where !app.buttons["about"].isHittable { app.swipeUp() }
         tap("about"); XCTAssertTrue(app.staticTexts["Version 4.0.2 · iOS"].waitForExistence(timeout: 5))
