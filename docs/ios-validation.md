@@ -12,7 +12,9 @@ The native interface keeps the cream/navy palette, serif typography, original em
 
 ## Validation
 
-Core tests and both compilation checks passed. Simulator interaction checks are still running; this document does not yet record a passing interaction result.
+**Passed:** eleven core tests, simulator and unsigned device Release compilation, and all four interface tests on each of iPhone 17, iPhone SE (3rd generation), and iPad (A16). The tested minimum deployment setting is 15.0; the build used SDK 26.2.
+
+The final screenshot review identified a legacy launcher image in the header. The header artwork was subsequently replaced by a direct rendering of the existing Android sun/crescent/star vector. This image-only correction does not change application logic or layout; the stale header screenshots are not presented as current release previews.
 
 Workflow: https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/40952205673
 

@@ -1,0 +1,32 @@
+{
+  "deploymentTarget": "15.0",
+  "version": "4.0.2",
+  "simulators": [
+    {
+      "name": "iPhone 17",
+      "label": "phone"
+    },
+    {
+      "name": "iPhone SE (3rd generation)",
+      "label": "small-phone"
+    },
+    {
+      "name": "iPad (A16)",
+      "label": "ipad"
+    }
+  ],
+  "uiChecks": "passed",
+  "minimumOSRuntimeTested": false,
+  "fixtureQuotes": "Debug UI tests only; not in Release",
+  "workflowRun": 40952205673,
+  "sourceCommit": "686749faab8bd69ed107f1161a964b0ba42f150a",
+  "xcode": "26.3",
+  "coreTests": 11,
+  "coreFailures": 0,
+  "uiTestsPerDevice": 4,
+  "uiFailures": 0,
+  "deviceReleaseBuild": "passed; unsigned",
+  "simulatorBuild": "passed",
+  "signedDistribution": "not configured",
+  "emblemCorrection": "Image-only replacement after functional validation; rendered from existing universal_emblem.xml"
+}

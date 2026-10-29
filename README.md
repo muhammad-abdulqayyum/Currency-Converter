@@ -6,7 +6,7 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 
 ## iPhone and iPad
 
-A native Swift/SwiftUI version is included in [`ios/`](ios/README.md), targeting iOS/iPadOS 15.0 and later, with the same 165 assets and independent pickers. See the [iOS build and simulator checks](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/ios.yml) for validation. TestFlight/App Store distribution requires Apple signing and your developer account; the Android APK does not run on iOS.
+A native Swift/SwiftUI version is included in [`ios/`](ios/README.md), targeting iOS/iPadOS 15.0 and later, with the same 165 assets and independent pickers. [Validation results](docs/ios-validation.md). See the [iOS build and simulator checks](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/ios.yml) for validation. TestFlight/App Store distribution requires Apple signing and your developer account; the Android APK does not run on iOS.
 
 ## Version 4.0.2
 
