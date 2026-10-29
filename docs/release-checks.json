@@ -1,0 +1,20 @@
+{
+  "androidApi": 23,
+  "unitTests": 21,
+  "lintErrors": 0,
+  "upgrade31To32": true,
+  "rotationFramesDiffer": true,
+  "restingGlobeMatches31": true,
+  "disabledAnimationFramesIdentical": true,
+  "largeTextSmoke": true,
+  "apks": {
+    "3.1": {
+      "bytes": 90799,
+      "sha256": "33722968d0b4d8661a45917fa610bcc1fd276e6aa873d5adf681ebbf705edaa3"
+    },
+    "3.2": {
+      "bytes": 93279,
+      "sha256": "58a1677f7138469d51bbd9dff2aa50cd4be32abbbd8722be48d50f892c52612b"
+    }
+  }
+}

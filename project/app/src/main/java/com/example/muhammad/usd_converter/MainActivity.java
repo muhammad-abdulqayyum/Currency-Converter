@@ -26,6 +26,7 @@ public class MainActivity extends Activity {
     private final View[] tabs = new View[3];
     private ProgressBar progress;
     private RateRepository repository;
+    private GlobeMotion globeMotion;
     private int section;
     private boolean destroyed, loading;
 
@@ -46,7 +47,12 @@ public class MainActivity extends Activity {
         convert = findViewById(R.id.convert); progress = findViewById(R.id.progress);
         tabs[0] = findViewById(R.id.world_tab); tabs[1] = findViewById(R.id.metals_tab);
         tabs[2] = findViewById(R.id.crypto_tab);
-        ((CategoryIconView)findViewById(R.id.world_icon)).setKind(0);
+        CategoryIconView worldIcon = findViewById(R.id.world_icon);
+        worldIcon.setKind(0);
+        globeMotion = new GlobeMotion(worldIcon);
+        root.getViewTreeObserver().addOnScrollChangedListener(() -> globeMotion.refreshVisibility());
+        root.getViewTreeObserver().addOnGlobalLayoutListener(() -> globeMotion.refreshVisibility());
+        worldIcon.post(() -> globeMotion.refreshVisibility());
         ((CategoryIconView)findViewById(R.id.metals_icon)).setKind(1);
         ((CategoryIconView)findViewById(R.id.crypto_icon)).setKind(2);
         repository = new RateRepository(getSharedPreferences("reference_rates", MODE_PRIVATE));
@@ -59,7 +65,7 @@ public class MainActivity extends Activity {
             int[] restored = state.getIntArray("selections");
             if (restored != null && restored.length == 3) System.arraycopy(restored, 0, selections, 0, 3);
         }
-        for (int i = 0; i < 3; i++) { final int target = i; tabs[i].setOnClickListener(v -> selectSection(target)); }
+        for (int i = 0; i < 3; i++) { final int target = i; tabs[i].setOnClickListener(v -> { selectSection(target); if (target == 0 && !loading) globeMotion.replay(); }); }
         selectSection(state == null ? 0 : state.getInt("section", 0));
         convert.setOnClickListener(v -> convert());
         findViewById(R.id.about).setOnClickListener(v -> new AlertDialog.Builder(this)
@@ -107,6 +113,7 @@ public class MainActivity extends Activity {
             }
             @Override public void onNothingSelected(AdapterView<?> parent) { }
         });
+        globeMotion.setSelected(section == 0);
         clearResult();
     }
     private void clearResult() {
@@ -159,5 +166,7 @@ public class MainActivity extends Activity {
     @Override protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out); out.putInt("section", section); out.putIntArray("selections", selections);
     }
-    @Override protected void onDestroy() { destroyed = true; executor.shutdownNow(); super.onDestroy(); }
+    @Override protected void onResume() { super.onResume(); if (globeMotion != null) globeMotion.setActive(true); }
+    @Override protected void onPause() { if (globeMotion != null) globeMotion.setActive(false); super.onPause(); }
+    @Override protected void onDestroy() { destroyed = true; if (globeMotion != null) globeMotion.destroy(); executor.shutdownNow(); super.onDestroy(); }
 }
