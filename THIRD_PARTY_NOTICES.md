@@ -21,3 +21,7 @@ Metal bars and Bitcoin coin are original canvas illustrations.
 ## Crypto identification artwork (4.0.3)
 
 The small ETH, LTC and XRP identification icons are locally drawn vectors in `artwork/crypto/`, rendered into matching bundled images for Android and iOS. They depict the recognizable Ethereum diamond, Litecoin Ł, and community XRP X symbol. They identify conversion assets and do not imply endorsement. Reference materials: https://ethereum.org/en/assets/ , https://litecoin.com/resources , https://xrpl.org/docs/introduction/what-is-xrp . Subunit badges are app labels, not separate coin logos.
+
+### Refined mobile category and bullion artwork
+
+`artwork/icons/` contains locally drawn bullion illustrations and Bitcoin/Bitcoin Cash symbol treatments, rendered to identical bundled Android and iOS PNGs. Cryptocurrency symbols identify their assets and do not imply endorsement. No remote image service or additional runtime library is used.

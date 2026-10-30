@@ -6,14 +6,10 @@ struct AssetIcon: View {
         Group {
             if asset.category == .world { Text(asset.symbol).font(.system(size: 30)) }
             else if asset.category == .metals {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 4).fill(LinearGradient(colors: asset.code == "XAU" ? [Color.yellow.opacity(0.45), Color(red: 0.74, green: 0.53, blue: 0.17)] : [.white, .gray], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .overlay(RoundedRectangle(cornerRadius: 4).stroke(Theme.muted.opacity(0.5))).frame(width: 34, height: 25).rotationEffect(.degrees(-16))
-                    Text(asset.symbol).font(.system(size: 13, weight: .medium, design: .serif)).foregroundColor(Theme.navy)
-                }
+                Image("Metal" + asset.code).resizable().scaledToFit().frame(width: 40, height: 40)
             } else {
                 ZStack(alignment: .bottomTrailing) {
-                    if ["ETH", "LTC", "XRP"].contains(asset.rateCode) {
+                    if ["BTC", "BCH", "ETH", "LTC", "XRP"].contains(asset.rateCode) {
                         Image("Crypto" + asset.rateCode).resizable().scaledToFit().frame(width: 40, height: 40)
                     } else {
                         ZStack {
@@ -52,7 +48,10 @@ struct AssetPicker: View {
                     ForEach(Category.allCases) { item in
                         Button { category = item; search = "" } label: {
                             VStack(spacing: 5) {
-                                Text(item == .world ? "🌎" : item == .metals ? "▰" : "₿").font(.system(size: 26))
+                                Group {
+                                    if item == .world { Text("🌎").font(.system(size: 30)) }
+                                    else { Image(item == .metals ? "CategoryMetals" : "CategoryCrypto").resizable().scaledToFit() }
+                                }.frame(width: 36, height: 36).accessibilityHidden(true)
                                 Text(item.rawValue).font(.subheadline.weight(.medium))
                             }.frame(maxWidth: .infinity).padding(.vertical, 9)
                                 .background(category == item ? Theme.navy : Theme.cream).cornerRadius(12)
