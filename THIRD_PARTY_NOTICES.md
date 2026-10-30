@@ -25,3 +25,7 @@ The small ETH, LTC and XRP identification icons are locally drawn vectors in `ar
 ### Refined mobile category and bullion artwork
 
 `artwork/icons/` contains locally drawn bullion illustrations and Bitcoin/Bitcoin Cash symbol treatments, rendered to identical bundled Android and iOS PNGs. Cryptocurrency symbols identify their assets and do not imply endorsement. No remote image service or additional runtime library is used.
+
+### Version 4.0.4 dimensional icons
+
+`premium_assets.png` and `premium_extras.png` (and matching iOS atlases) are AI-generated artwork developed for this app from the approved design concept. Asset symbols identify currencies and do not imply endorsement. The app draws individual cells from bundled atlases; no network image requests or new runtime dependencies are needed.

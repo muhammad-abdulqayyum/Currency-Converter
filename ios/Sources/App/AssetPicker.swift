@@ -1,16 +1,42 @@
 import SwiftUI
 
+/// One shared bundled atlas preserves the same artwork on both platforms.
+private enum PremiumArtwork {
+    static let assets = UIImage(named: "PremiumAssets")?.cgImage
+    static let extras = UIImage(named: "PremiumExtras")?.cgImage
+    static func image(_ code: String) -> UIImage? {
+        let codes = ["XAU", "XAG", "XPT", "XPD", "BTC", "ETH", "XRP", "LTC"]
+        let extra = code == "METALS" || code == "BCH"
+        guard let atlas = extra ? extras : assets else { return nil }
+        let columns = extra ? 2 : 4, rows = extra ? 1 : 2
+        let index = extra ? (code == "METALS" ? 0 : 1) : (codes.firstIndex(of: code) ?? 4)
+        let x = index % columns, y = index / columns
+        let rect = CGRect(x: x * atlas.width / columns, y: y * atlas.height / rows,
+                          width: (x+1)*atlas.width/columns - x*atlas.width/columns,
+                          height: (y+1)*atlas.height/rows - y*atlas.height/rows)
+        guard let cell = atlas.cropping(to: rect) else { return nil }
+        return UIImage(cgImage: cell)
+    }
+}
+private struct PremiumIcon: View {
+    let code: String
+    var body: some View {
+        if let image = PremiumArtwork.image(code) { Image(uiImage: image).resizable().scaledToFit() }
+    }
+}
+
+
 struct AssetIcon: View {
     let asset: Asset
     var body: some View {
         Group {
             if asset.category == .world { Text(asset.symbol).font(.system(size: 30)) }
             else if asset.category == .metals {
-                Image("Metal" + asset.code).resizable().scaledToFit().frame(width: 40, height: 40)
+                PremiumIcon(code: asset.code).frame(width: 40, height: 40)
             } else {
                 ZStack(alignment: .bottomTrailing) {
                     if ["BTC", "BCH", "ETH", "LTC", "XRP"].contains(asset.rateCode) {
-                        Image("Crypto" + asset.rateCode).resizable().scaledToFit().frame(width: 40, height: 40)
+                        PremiumIcon(code: asset.rateCode).frame(width: 40, height: 40)
                     } else {
                         ZStack {
                             Circle().fill(LinearGradient(colors: [Color.yellow.opacity(0.5), .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
@@ -50,7 +76,7 @@ struct AssetPicker: View {
                             VStack(spacing: 5) {
                                 Group {
                                     if item == .world { Text("🌎").font(.system(size: 30)) }
-                                    else { Image(item == .metals ? "CategoryMetals" : "CategoryCrypto").resizable().scaledToFit() }
+                                    else { PremiumIcon(code: item == .metals ? "METALS" : "BTC") }
                                 }.frame(width: 36, height: 36).accessibilityHidden(true)
                                 Text(item.rawValue).font(.subheadline.weight(.medium))
                             }.frame(maxWidth: .infinity).padding(.vertical, 9)
@@ -92,7 +118,7 @@ struct AboutView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     Text("Universal Currency Converter").font(.system(.title2, design: .serif)).foregroundColor(Theme.navy)
-                    Text("Version 4.0.3 · iOS")
+                    Text("Version 4.0.4 · iOS")
                     Text("Created by Muhammad Hafiz Abdul-Qayyum\nFrom Clinton Hill, Brooklyn, New York City, USA")
                     Text("“From your Brother Muhammad Hafiz Abdul-Qayyum in the Wilderness of North America.”")
                     Text("For humanity. If Allah wills.")

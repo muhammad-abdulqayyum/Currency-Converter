@@ -20,7 +20,7 @@ public class CategoryIconView extends View {
     private double centerLongitude = -80;
 
     public CategoryIconView(Context context, AttributeSet attrs) { super(context, attrs); }
-    public void setKind(int value) { kind = value; if (kind == 0) prepareGlobe(); else categoryArtwork = BitmapFactory.decodeResource(getResources(), kind == 1 ? R.drawable.category_metals : R.drawable.category_crypto); invalidate(); }
+    public void setKind(int value) { kind = value; if (kind == 0) prepareGlobe(); else categoryArtwork = BitmapFactory.decodeResource(getResources(), kind == 1 ? R.drawable.premium_extras : R.drawable.premium_assets); invalidate(); }
 
     private void prepareGlobe() {
         Bitmap mask = BitmapFactory.decodeResource(getResources(), R.drawable.earth_land);
@@ -74,7 +74,7 @@ public class CategoryIconView extends View {
             canvas.drawCircle(50, 50, 41, paint); paint.setStyle(Paint.Style.FILL);
         } else if (categoryArtwork != null) {
             paint.setShader(null); paint.setStyle(Paint.Style.FILL); paint.setFilterBitmap(true);
-            canvas.drawBitmap(categoryArtwork, null, new RectF(0, 0, 100, 100), paint);
+            AssetIconView.drawCell(canvas, categoryArtwork, kind == 1 ? 0 : 4, kind == 1 ? 2 : 4, kind == 1 ? 1 : 2, paint);
         }
         canvas.restore();
     }
