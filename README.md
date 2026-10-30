@@ -88,3 +88,7 @@ Minimum Android 6.0/API 23; compile/target SDK 35. Play publishing needs a produ
 For humanity. If Allah wills.
 
 [Illustration credits](THIRD_PARTY_NOTICES.md). Original project uploaded in 2017. Land, advertising, paid upgrades and live market feeds remain outside this release.
+
+## Cloudflare web app
+
+The Angular frontend and TypeScript Worker backend live alongside the mobile apps. See [Cloudflare web deployment](docs/cloudflare-web.md) for setup and validation.
