@@ -68,7 +68,7 @@ final class ConverterUITests: XCTestCase {
         }
         let screenshot = XCTAttachment(screenshot: app.screenshot()); screenshot.name = "iOS Home"; screenshot.lifetime = .keepAlways; add(screenshot)
         for _ in 0..<3 where !app.buttons["about"].isHittable { app.swipeUp() }
-        tap("about"); XCTAssertTrue(app.staticTexts["Version 4.0.3 · iOS"].waitForExistence(timeout: 5))
+        tap("about"); XCTAssertTrue(app.staticTexts["Version 4.0.4 · iOS"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Clinton Hill")).firstMatch.exists)
     }
     func testLargeTextAndLandscapeFooter() {
@@ -79,6 +79,6 @@ final class ConverterUITests: XCTestCase {
         defer { XCUIDevice.shared.orientation = .portrait }
         for _ in 0..<8 where !app.buttons["about"].isHittable { app.swipeUp() }
         tap("about")
-        XCTAssertTrue(app.staticTexts["Version 4.0.3 · iOS"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Version 4.0.4 · iOS"].waitForExistence(timeout: 5))
     }
 }

@@ -56,9 +56,12 @@ def launch():
  adb('shell','am','force-stop',PKG);adb('shell','am','start','-W','-n',PKG+'/.MainActivity');time.sleep(1)
 serial=adb('get-serialno').decode().strip()
 assert serial.startswith('emulator-'),'Use a dedicated emulator only'
-adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.2.apk'))
-adb('install','-r',str(ROOT/'android-installer-file/Currency-Converter-4.0.3.apk'))
-print('PASS: upgrade 4.0.2 to 4.0.3',flush=True)
+baseline = ROOT/'android-installer-file/Currency-Converter-4.0.3.apk'
+candidate = pathlib.Path(os.environ.get('CANDIDATE_APK', str(ROOT/'android-installer-file/Currency-Converter-4.0.4.apk')))
+if os.environ.get('SKIP_UPGRADE') != '1':
+ adb('install','-r',str(baseline))
+adb('install','-r',str(candidate))
+print('PASS: candidate installed' if os.environ.get('SKIP_UPGRADE') == '1' else 'PASS: upgrade 4.0.3 to 4.0.4',flush=True)
 adb('shell','wm','size','420x900');adb('shell','wm','density','160');adb('shell','input','keyevent','82');adb('logcat','-c')
 now=int(time.time()*1000);day=datetime.datetime.now(datetime.timezone.utc).date();prefs=['<map>']
 for code,rate in {'GBP':'0.8','BRL':'5','PHP':'60','XAU':'0.00025','XAG':'0.025','BTC':'0.00001','XRP':'0.5'}.items():
@@ -71,7 +74,7 @@ try:
  top();tap('from_asset');tap('metals_tab');shot('metals-picker');tap('Gold',True)
  choose('to_asset','world_tab','US Dollar','USD');check('400,000.00 USD')
  top();tap('swap');check('0.025 troy oz of Gold')
- top();tap('from_asset');tap('crypto_tab');shot('crypto-picker');tap('Bitcoin',True);check('2,500 troy oz of Gold');assert b'Different reference dates' in ui();print('PASS: dates disclosed',flush=True)
+ top();tap('from_asset');tap('crypto_tab');shot('crypto-picker');shot('crypto-picker');tap('Bitcoin',True);check('2,500 troy oz of Gold');assert b'Different reference dates' in ui();print('PASS: dates disclosed',flush=True)
  choose('to_asset','metals_tab','Silver');check('250,000 troy oz of Silver')
  choose('from_asset','world_tab','Brazilian Real','BRL');choose('to_asset','world_tab','Philippine Peso','PHP');check('1,200.00 PHP')
  choose('from_asset','metals_tab','Palladium');choose('to_asset','metals_tab','Palladium');check('100 troy oz of Palladium')
@@ -80,11 +83,11 @@ try:
  choose('from_asset','crypto_tab','XRP','XRP');choose('to_asset','crypto_tab','Drops (XRP)','DROP');check('100,000,000 DROP')
  top();tap('swap');check('0.0001 XRP')
  choose('from_asset','crypto_tab','Satoshi (Bitcoin)','SAT');choose('to_asset','crypto_tab','Drops (XRP)','DROP');check('50,000 DROP');assert b'Different reference dates' in ui()
- launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0.3' in ui();adb('shell','input','keyevent','4')
- adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0.3' in ui();adb('shell','input','keyevent','4')
+ launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0.4' in ui();adb('shell','input','keyevent','4')
+ adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);tap('from_asset');tap('crypto_tab');shot('large-crypto-picker');tap('Bitcoin Cash',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0.4' in ui();adb('shell','input','keyevent','4')
  logs=adb('logcat','-d');(OUT/'logcat.txt').write_bytes(logs);assert b'FATAL EXCEPTION' not in logs
  print('ALL DEVICE CHECKS PASSED',flush=True)
- for name in ['home','metals-picker','crypto-picker','footer','large-picker','large-footer']:
+ for name in ['home','metals-picker','crypto-picker','footer','large-picker','large-crypto-picker','large-footer']:
   print('SCREENSHOT_'+name+'='+base64.b64encode((OUT/(name+'.png')).read_bytes()).decode(),flush=True)
 finally:
  adb('shell','settings','put','system','font_scale','1.0')

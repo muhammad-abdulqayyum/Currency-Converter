@@ -53,6 +53,6 @@ for label,device in matrix:
  # Reduce screenshot size only for log transfer; the full original is in the artifact.
  subprocess.run(['sips','-Z','1000',str(OUT/(label+'.png')),'--out',str(OUT/(label+'-preview.png'))],check=True)
  print('IOS_SCREENSHOT_'+label+'='+base64.b64encode((OUT/(label+'-preview.png')).read_bytes()).decode(),flush=True)
-(OUT/'validation.json').write_text(json.dumps({'deploymentTarget':'15.0','version':'4.0.3','simulators':[{'name':d['name'],'label':label} for label,d in matrix],
+(OUT/'validation.json').write_text(json.dumps({'deploymentTarget':'15.0','version':'4.0.4','simulators':[{'name':d['name'],'label':label} for label,d in matrix],
  'uiChecks':'passed','minimumOSRuntimeTested':False,'fixtureQuotes':'Debug UI tests only; not in Release'},indent=2))
 print('ALL IOS SIMULATOR CHECKS PASSED',flush=True)
