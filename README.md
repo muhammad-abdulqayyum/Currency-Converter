@@ -1,8 +1,14 @@
-# Universal Currency Converter · Version 4.0.3
+# Universal Currency Converter · Version 4.0.4 preview
 
 By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
-**[Download Version 4.0.3](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.3.apk)** · Android 6.0+ · debug-signed preview.
+**[Download Version 4.0.4 preview](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/develop/android-installer-file/Currency-Converter-4.0.4.apk)** · Android 6.0+ · debug-signed preview.
+
+## Version 4.0.4 preview
+
+Dimensional Au/Ag/Pt/Pd bullion, BTC/ETH/XRP/LTC recognition icons and a green BCH coin are bundled identically on Android and iOS. BCH's white B tilts left; BTC tilts right. SAT and DROP keep their parent icons and denomination badges. Android's About screen now correctly reports 4.0.4.
+
+Development and preview APKs live on `develop`; `master` remains the approved release line. Review a preview before merging it. [4.0.4 validation](docs/version-4.0.4-validation.md).
 
 ## iPhone and iPad
 
@@ -50,7 +56,7 @@ HTTPS certificate validation, connection/read timeouts, response size limits and
 
 ## Install and build
 
-Version 4.0.3 uses version code 43 and the same preview signing certificate as earlier 4.x previews, allowing an in-place update. Older 3.x previews used a different certificate and may require uninstalling once. The preview key is backed up privately for future updates. Production publishing needs a separately prepared release and private signing/upload key; never commit private keys.
+Version 4.0.4 uses version code 44 and the same preview signing certificate as earlier 4.x previews, allowing an in-place update. Older 3.x previews used a different certificate and may require uninstalling once. The preview key is backed up privately for future updates. Production publishing needs a separately prepared release and private signing/upload key; never commit private keys.
 
 [Version 4.0](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.apk) · [Version 4.0 history](docs/version-4.0-history.md)
 
