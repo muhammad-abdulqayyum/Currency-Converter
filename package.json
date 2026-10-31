@@ -1,0 +1,14 @@
+{
+  "name": "universal-currency-converter",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix web run build",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "type": "module"
+}
