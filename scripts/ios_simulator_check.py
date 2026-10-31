@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build and test the real iOS app on the available Apple-hosted simulators."""
-import base64,json,pathlib,subprocess,time,sys,platform
+import json,pathlib,subprocess,time,sys,platform
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/'ios/build';OUT.mkdir(exist_ok=True)
 def run(*args):
@@ -50,9 +50,6 @@ for label,device in matrix:
  time.sleep(2)
  subprocess.run(['xcrun','simctl','io',udid,'screenshot',str(OUT/(label+'.png'))],check=True)
  print('PASS: '+label+' '+device['name'],flush=True)
- # Reduce screenshot size only for log transfer; the full original is in the artifact.
- subprocess.run(['sips','-Z','1000',str(OUT/(label+'.png')),'--out',str(OUT/(label+'-preview.png'))],check=True)
- print('IOS_SCREENSHOT_'+label+'='+base64.b64encode((OUT/(label+'-preview.png')).read_bytes()).decode(),flush=True)
 (OUT/'validation.json').write_text(json.dumps({'deploymentTarget':'15.0','version':'4.0.4','simulators':[{'name':d['name'],'label':label} for label,d in matrix],
  'uiChecks':'passed','minimumOSRuntimeTested':False,'fixtureQuotes':'Debug UI tests only; not in Release'},indent=2))
 print('ALL IOS SIMULATOR CHECKS PASSED',flush=True)

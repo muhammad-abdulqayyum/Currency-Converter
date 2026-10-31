@@ -1,6 +1,6 @@
 # Universal Currency Converter for iPhone and iPad
 
-Native Swift/SwiftUI version 4.0.3 by Muhammad Hafiz Abdul-Qayyum, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
+Native Swift/SwiftUI version 4.0.4 by Muhammad Hafiz Abdul-Qayyum, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
 Minimum deployment target: **iOS/iPadOS 15.0**. Universal iPhone/iPad interface; portrait and landscape; safe-area insets; Dynamic Type and VoiceOver labels; scrolls on small screens and with larger text. Uses only Apple frameworks, with no third-party runtime dependencies. Keep the Android APK for Android; it cannot install on iOS.
 
@@ -35,6 +35,19 @@ python3 scripts/ios_simulator_check.py
 Run from the repository root after generating the Xcode project. The iOS GitHub Actions workflow runs core tests, builds the real simulator application, runs UI tests on available phone/small-phone/iPad simulators, captures real screenshots, and compiles an unsigned device Release build. Read the workflow result for actual tested OS versions: the iOS 15 deployment target is not a claim that an iOS 15 runtime was exercised. Apple-hosted CI generally provides newer simulator runtimes. Physical-device testing, particularly an older iOS 15 device, remains a release validation step.
 
 Debug UI tests inject synthetic rates using the `-ui-testing` launch argument; the fixtures and launch-argument override are compiled out of Release. Screenshots show the initial screen without synthetic quotes. Decimal arithmetic checks calculation errors and reports overflow rather than displaying an invalid result; final output rounds to currency/asset precision.
+
+## Download the CI simulator build
+
+In GitHub Actions, open a successful **iOS build and simulator checks** run, then download **Universal-Currency-Converter-iOS-Simulator** under Artifacts. Extract the artifact, then extract the nested `Universal-Currency-Converter-iOS-Simulator.zip` on your Mac. The nested archive preserves the app executable permissions. Screenshots, logs, test results and validation metadata accompany it; artifacts are retained for 14 days.
+
+Boot an iOS simulator in Xcode and install the extracted app:
+
+```sh
+xcrun simctl install booted /absolute/path/to/UniversalCurrencyConverter.app
+xcrun simctl launch booted com.muhammadabdulqayyum.universalconverter
+```
+
+Use a simulator with a compatible OS and the same architecture as the CI runner; this is not an iPhone installer. Build locally with Xcode if your Mac's simulator architecture differs.
 
 ## Sharing with people
 
