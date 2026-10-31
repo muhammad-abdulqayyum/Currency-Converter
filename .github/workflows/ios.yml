@@ -6,6 +6,9 @@ on:
   pull_request:
     paths: ['ios/**', 'scripts/ios_simulator_check.py', '.github/workflows/ios.yml']
   workflow_dispatch:
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -38,16 +41,35 @@ jobs:
       - name: Build iPhone and iPad simulator app
         run: python3 scripts/ios_simulator_check.py --build-only
       - name: Compile unsigned device Release
-        run: xcodebuild -project ios/UniversalCurrencyConverter.xcodeproj -scheme UniversalCurrencyConverter -configuration Release -destination 'generic/platform=iOS' -derivedDataPath ios/build/device CODE_SIGNING_ALLOWED=NO build > ios/build/device-build.log 2>&1
+        run: |
+          mkdir -p ios/build
+          if ! xcodebuild -project ios/UniversalCurrencyConverter.xcodeproj -scheme UniversalCurrencyConverter -configuration Release -destination 'generic/platform=iOS' -derivedDataPath ios/build/device CODE_SIGNING_ALLOWED=NO build > ios/build/device-build.log 2>&1; then
+            tail -n 150 ios/build/device-build.log
+            exit 1
+          fi
       - name: Run iPhone and iPad interface tests
         run: python3 scripts/ios_simulator_check.py --test-only
+      - name: Package simulator app with executable permissions
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            ios/build/simulator/Build/Products/Debug-iphonesimulator/UniversalCurrencyConverter.app \
+            ios/build/Universal-Currency-Converter-iOS-Simulator.zip
+          python3 - <<'PYCODE'
+          import pathlib, zipfile
+          archive = pathlib.Path('ios/build/Universal-Currency-Converter-iOS-Simulator.zip')
+          with zipfile.ZipFile(archive) as bundle:
+              binary = bundle.getinfo('UniversalCurrencyConverter.app/UniversalCurrencyConverter')
+              if not (binary.external_attr >> 16) & 0o111:
+                  raise SystemExit('Simulator archive lost executable permissions')
+          PYCODE
       - name: Upload simulator app, screenshots and checks
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Universal-Currency-Converter-iOS-Simulator
+          retention-days: 14
           path: |
-            ios/build/simulator/Build/Products/Debug-iphonesimulator/UniversalCurrencyConverter.app
+            ios/build/Universal-Currency-Converter-iOS-Simulator.zip
             ios/build/*.png
             ios/build/*.json
             ios/build/*.log

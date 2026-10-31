@@ -4,3 +4,14 @@ web/dist/
 web/.angular/
 .wrangler/
 .dev.vars
+
+# Generated Apple builds and local signing/user state
+ios/build/
+ios/.build/
+ios/UniversalCurrencyConverter.xcodeproj/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.mobileprovision
+*.p12
+.DS_Store
