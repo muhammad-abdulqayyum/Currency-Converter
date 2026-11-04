@@ -7,14 +7,18 @@ import { assets, Asset } from '../../shared/assets';
   selector: 'app-root', standalone: true, imports: [FormsModule, NgTemplateOutlet],
   template: `
   <ng-template #assetIcon let-asset>
-    <span class="asset-icon" [class.metal]="asset.kind === 'metal'" [class.crypto]="asset.kind === 'crypto'" aria-hidden="true">
+    <span class="asset-icon" [class.artwork]="asset.kind !== 'world'" aria-hidden="true">
       @if (asset.kind === 'crypto') {
         <img [src]="cryptoIcon(asset.code)" alt="">
         @if (asset.code === 'SAT' || asset.code === 'DROP') {
           <span class="crypto-unit">{{asset.code.toLowerCase()}}</span>
         }
+      } @else if (asset.kind === 'metal') {
+        <img [src]="'icons/' + asset.code.toLowerCase() + '.png'" alt="">
       } @else {
-        {{asset.icon}}
+        @for (flag of worldIcons(asset.icon); track flag) {
+          <img class="world-flag" [src]="flag" alt="">
+        }
       }
     </span>
   </ng-template>
@@ -36,6 +40,15 @@ import { assets, Asset } from '../../shared/assets';
 class App {
   amount='100'; from='USD'; to='EUR'; assets=assets; kinds=['world','metal','crypto']; kind='world'; search='';
   picking=signal<''|'from'|'to'>(''); loading=signal(false); error=signal(''); result=signal<any>(null); private version=0;
+  worldIcons(icon: string): string[] {
+    const flags = icon.match(/[\u{1F1E6}-\u{1F1FF}]{2}/gu) ?? [];
+    if (!flags.length) return ['icons/category_world.png'];
+    return flags.map(flag => {
+      const region = Array.from(flag, letter =>
+        String.fromCharCode(letter.codePointAt(0)! - 0x1F1E6 + 97)).join('');
+      return 'flags/' + region + '.svg';
+    });
+  }
   cryptoIcon(code: string): string {
     const coin = code === 'SAT' ? 'BTC' : code === 'DROP' ? 'XRP' : code;
     return 'icons/' + coin.toLowerCase() + '.png';

@@ -13,7 +13,9 @@
             "index": "src/index.html",
             "tsConfig": "tsconfig.json",
             "assets": [
-              {"glob": "*", "input": "src/icons", "output": "icons"}
+              {"glob": "*", "input": "src/icons", "output": "icons"},
+              {"glob": "*.svg", "input": "node_modules/flag-icons/flags/4x3", "output": "flags"},
+              {"glob": "LICENSE", "input": "node_modules/flag-icons", "output": "flags"}
             ],
             "styles": [
               "src/styles.css"
