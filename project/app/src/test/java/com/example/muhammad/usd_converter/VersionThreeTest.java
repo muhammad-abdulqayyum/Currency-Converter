@@ -20,7 +20,7 @@ public class VersionThreeTest {
         assertEquals(3, RatePolicy.ageDays("2026-10-26", now));
         assertEquals(7, RatePolicy.ageDays("2026-10-22", now));
     }
-    @Test(expected=IllegalArgumentException.class) public void staleRateRejected() { RatePolicy.ageDays("2026-10-21", now); }
+    @Test public void monthsOldRateAccepted() { assertEquals(120, RatePolicy.ageDays("2026-07-01", now)); }
     @Test(expected=IllegalArgumentException.class) public void futureRateRejected() { RatePolicy.ageDays("2026-10-30", now); }
     @Test(expected=IllegalArgumentException.class) public void impossibleDateRejected() { RatePolicy.ageDays("2026-02-30", now); }
     @Test public void cacheExpiresAndRejectsClockRollback() {

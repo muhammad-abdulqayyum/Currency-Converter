@@ -37,29 +37,52 @@ public final class RateRepository {
         long now = System.currentTimeMillis();
         String key = "v3." + asset.code;
         String stored = cache.getString(key, null);
-        if (stored != null && RatePolicy.reusable(cache.getLong(key + ".time", 0), now)) {
+        long fetchedAt = cache.getLong(key + ".time", 0);
+        if (stored != null && RatePolicy.reusable(fetchedAt, now)) {
             try { return parse(new JSONObject(stored), asset, true, false, now); }
-            catch (Exception ignored) { cache.edit().remove(key).remove(key + ".time").apply(); }
+            catch (Exception ignored) { /* A refresh may establish a better reference date. */ }
         }
         try {
-            JSONObject body = new JSONObject(download(asset, ""));
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            format.setTimeZone(TimeZone.getTimeZone("UTC"));
-            String today = format.format(new Date(now));
-            String date = body.getString("date");
-            if (date.compareTo(today) > 0) {
-                // The latest feed can include a provider already reporting tomorrow's date.
-                body = new JSONObject(download(asset, "&date=" + today));
+            Response latest = download(asset, "");
+            long referenceTime = latest.serverTime > 0 ? latest.serverTime : now;
+            JSONObject body = new JSONObject(latest.body);
+            Quote quote;
+            try {
+                quote = parse(body, asset, false, false, referenceTime);
+            } catch (Exception invalidLatest) {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                format.setTimeZone(TimeZone.getTimeZone("UTC"));
+                String range = "&from=" + format.format(new Date(referenceTime - 7 * RatePolicy.DAY))
+                        + "&to=" + format.format(new Date(referenceTime));
+                JSONArray history = new JSONArray(download(asset, range).body);
+                quote = null;
+                for (int i = 0; i < history.length(); i++) {
+                    JSONObject candidate = history.optJSONObject(i);
+                    if (candidate == null) continue;
+                    try {
+                        Quote historical = parse(candidate, asset, false, false, referenceTime);
+                        if (quote == null || historical.date.compareTo(quote.date) > 0) {
+                            quote = historical;
+                            body = candidate;
+                        }
+                    } catch (Exception ignored) { /* Skip invalid history entries. */ }
+                }
+                if (quote == null) throw invalidLatest;
             }
-            Quote quote = parse(body, asset, false, false, now);
-            cache.edit().putString(key, compact(body)).putLong(key + ".time", now).apply();
+            if (stored != null) {
+                Quote saved = null;
+                try { saved = parse(new JSONObject(stored), asset, true, false, referenceTime); }
+                catch (Exception ignored) { /* Ignore invalid saved data. */ }
+                if (saved != null && saved.date.compareTo(quote.date) > 0) return saved;
+            }
+            cache.edit().putString(key, compact(body)).putLong(key + ".time", referenceTime).apply();
             return quote;
         } catch (Exception networkError) {
             if (stored != null) {
-                try { return parse(new JSONObject(stored), asset, true, true, now); }
-                catch (Exception ignored) { /* Old or invalid cache is never displayed as a price. */ }
+                try { return parse(new JSONObject(stored), asset, true, true, Math.max(now, fetchedAt)); }
+                catch (Exception ignored) { /* Invalid cache is never displayed as a price. */ }
             }
-            throw new IOException("No recent reference rate available", networkError);
+            throw new IOException("No verified reference rate available", networkError);
         }
     }
     private String compact(JSONObject body) throws Exception {
@@ -101,10 +124,21 @@ public final class RateRepository {
                 : "Frankfurter · official-source reference rates" + (names.length() > 0 ? "\nProviders: " + names + (providerCount > 3 ? " + " + (providerCount - 3) + " more" : "") : "");
         return new Quote(rate, date, source, saved, offline, age);
     }
-    private String download(Asset asset, String dateQuery) throws Exception {
-        String endpoint = "https://api.frankfurter.dev/v2/rate/USD/" + asset.code + "?expand=providers";
+    private static final class Response {
+        final String body;
+        final long serverTime;
+
+        Response(String body, long serverTime) {
+            this.body = body;
+            this.serverTime = serverTime;
+        }
+    }
+    private Response download(Asset asset, String range) throws Exception {
+        String endpoint = range.isEmpty()
+                ? "https://api.frankfurter.dev/v2/rate/USD/" + asset.code + "?expand=providers"
+                : "https://api.frankfurter.dev/v2/rates?base=USD&quotes=" + asset.code + "&expand=providers" + range;
         if (asset.kind == Asset.Kind.CRYPTO) endpoint += "&providers=ESTV";
-        HttpsURLConnection connection = (HttpsURLConnection) new URL(endpoint + dateQuery).openConnection();
+        HttpsURLConnection connection = (HttpsURLConnection) new URL(endpoint).openConnection();
         connection.setConnectTimeout(10000); connection.setReadTimeout(10000);
         connection.setInstanceFollowRedirects(false);
         connection.setRequestProperty("Accept", "application/json");
@@ -117,7 +151,7 @@ public final class RateRepository {
                     body.append(buffer, 0, count);
                     if (body.length() > 65536) throw new IOException("Unexpected response size");
                 }
-                return body.toString();
+                return new Response(body.toString(), connection.getHeaderFieldDate("Date", 0));
             }
         } finally { connection.disconnect(); }
     }

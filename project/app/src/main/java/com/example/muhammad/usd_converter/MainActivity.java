@@ -134,7 +134,7 @@ public class MainActivity extends Activity {
     }
     private void clearResult(){if(result==null)return;resultLabel.setText("YOUR CONVERSION");result.setText("Ready to convert");status.setText("Choose your pair and tap Convert. Rate dates appear with results.");}
     private void busy(boolean value){loading=value;convert.setEnabled(!value);fromButton.setEnabled(!value);toButton.setEnabled(!value);swap.setEnabled(!value);amount.setEnabled(!value);progress.setVisibility(value?View.VISIBLE:View.GONE);}
-    private String quoteDetails(Asset a,RateRepository.Quote q){if(a.code.equals("USD"))return "USD · common reference base";return a.code+" · "+q.date+(q.age>3?" · older reference ("+q.age+" days)":"")+"\n"+(q.offline?"Saved rate · connection unavailable":q.saved?"Saved rate · reused locally":"Reference rate retrieved")+"\n"+q.source;}
+    private String quoteDetails(Asset a,RateRepository.Quote q){if(a.code.equals("USD"))return "USD · common reference base";return a.code+" · "+q.date+(q.age>7?" · Older rate. The current rate may differ.":"")+"\n"+(q.offline?"Saved rate · refresh unavailable":q.saved?"Saved rate · reused locally":"Reference rate retrieved")+"\n"+q.source;}
     private void convert(){
         if(loading)return;final BigDecimal input;
         try{input=Conversion.assetAmount(amount.getText().toString());amount.setError(null);}catch(IllegalArgumentException e){amount.setError("Enter 0 to 1 trillion, with up to 8 decimal places. Use a decimal point.");amount.requestFocus();return;}

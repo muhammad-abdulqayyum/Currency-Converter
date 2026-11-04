@@ -45,7 +45,7 @@ public enum ConverterError: LocalizedError {
         switch self {
         case .catalog: return "The asset catalog could not be loaded."
         case .amount: return "Enter 0 to 1 trillion, with up to 8 decimal places. Use a decimal point."
-        case .unavailable: return "No recent reference rate is available. Check your connection and try again."
+        case .unavailable: return "No verified reference rate is available. Try again when you are online."
         case .arithmetic: return "This conversion exceeds the supported precision. Try a smaller amount."
         default: return "The service returned an invalid or outdated reference rate. Please try again later."
         }

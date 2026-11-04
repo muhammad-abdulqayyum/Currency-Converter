@@ -4,6 +4,10 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 
 **[Download Version 4.0.4 preview](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/develop/android-installer-file/Currency-Converter-4.0.4.apk)** · Android 6.0+ · debug-signed preview.
 
+## Version 4.0.5 mobile changes
+
+Android and iOS can reuse a verified saved quote offline regardless of age. Both show the quote date and warn after seven days.
+
 ## Version 4.0.4 preview
 
 Dimensional Au/Ag/Pt/Pd bullion, BTC/ETH/XRP/LTC recognition icons and a green BCH coin are bundled identically on Android and iOS. BCH's white B tilts left; BTC tilts right. SAT and DROP keep their parent icons and denomination badges. Android's About screen now correctly reports 4.0.4.
@@ -50,7 +54,7 @@ The bundled catalog includes national, shared and territorial currencies. It exc
 
 ## Lightweight and private
 
-No account, ads, analytics SDKs, private API keys or application backend. Only validated rate snapshots are cached locally, reusable for six hours. If refreshing fails, a valid saved quote up to seven days old may be shown with an explicit offline label. Amounts and conversion history are not written to persistent storage; current input and pair survive normal activity recreation.
+No account, ads, analytics SDKs, private API keys or application backend. Only validated rate snapshots are cached locally, reusable for six hours. If refreshing fails, a valid saved quote may be shown with its date and a warning after seven days. Amounts and conversion history are not written to persistent storage; current input and pair survive normal activity recreation.
 
 HTTPS certificate validation, connection/read timeouts, response size limits and duplicate-request prevention remain enabled. No insecure network fallback is used.
 

@@ -40,7 +40,8 @@ final class ConverterCoreTests: XCTestCase {
     func testDatePolicy() throws {
         XCTAssertEqual(try RatePolicy.age("2026-10-29", now: now), 0)
         XCTAssertEqual(try RatePolicy.age("2026-10-22", now: now), 7)
-        for s in ["2026-10-21", "2026-10-30", "2026-02-30", "2026-2-01", "garbage"] { XCTAssertThrowsError(try RatePolicy.age(s, now: now), s) }
+        XCTAssertEqual(try RatePolicy.age("2026-07-01", now: now), 120)
+        for s in ["2026-10-30", "2026-02-30", "2026-2-01", "garbage"] { XCTAssertThrowsError(try RatePolicy.age(s, now: now), s) }
     }
     func testResponseValidation() throws {
         XCTAssertEqual(try RatePolicy.quote(payload(), for: gbp, now: now).rate, Decimal(string: "0.8"))
@@ -59,12 +60,23 @@ final class ConverterCoreTests: XCTestCase {
         let repo = RateRepository(store: store, download: { _ in XCTFail("Fresh cache should avoid download"); throw ConverterError.unavailable })
         let q = try await repo.get(gbp, now: now); XCTAssertTrue(q.saved); XCTAssertFalse(q.offline)
     }
-    func testStaleCacheOfflineAndTooOldRefusal() async throws {
+    func testMonthsOldCacheWorksOffline() async throws {
         let store = MemoryStore(); store.values["GBP"] = Snapshot(data: payload(date: "2026-10-25"), fetchedAt: now.addingTimeInterval(-30000))
         let repo = RateRepository(store: store, download: { _ in throw ConverterError.unavailable })
         let q = try await repo.get(gbp, now: now); XCTAssertTrue(q.offline); XCTAssertEqual(q.age, 4)
-        store.values["GBP"] = Snapshot(data: payload(date: "2026-10-21"), fetchedAt: now.addingTimeInterval(-30000))
-        do { _ = try await repo.get(gbp, now: now); XCTFail("Expired quote accepted") } catch { }
+        store.values["GBP"] = Snapshot(data: payload(date: "2026-07-01"), fetchedAt: now.addingTimeInterval(-120 * 86400))
+        let old = try await repo.get(gbp, now: now)
+        XCTAssertEqual(old.age, 120)
+        XCTAssertTrue(old.details(code: "GBP").contains("The current rate may differ."))
+    }
+    func testFutureQuoteFallsBackToNewestValidHistoryOnFirstUse() async throws {
+        let future = payload(date: "2026-10-30")
+        let newest = payload(date: "2026-10-27")
+        let older = payload(date: "2026-10-25")
+        let history = Data("[".utf8) + newest + Data(",".utf8) + older + Data(",".utf8) + future + Data("]".utf8)
+        let repo = RateRepository(store: MemoryStore(), download: { _ in future }, history: { _, _ in history })
+        let quote = try await repo.get(gbp, now: now)
+        XCTAssertEqual(quote.date, "2026-10-27")
     }
     func testInvalidFreshCacheRefreshes() async throws {
         let store = MemoryStore(); store.values["GBP"] = Snapshot(data: payload(code: "JPY"), fetchedAt: now)

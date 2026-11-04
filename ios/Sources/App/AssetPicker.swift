@@ -118,7 +118,7 @@ struct AboutView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     Text("Universal Currency Converter").font(.system(.title2, design: .serif)).foregroundColor(Theme.navy)
-                    Text("Version 4.0.4 · iOS")
+                    Text("Version 4.0.5 · iOS")
                     Text("Created by Muhammad Hafiz Abdul-Qayyum\nFrom Clinton Hill, Brooklyn, New York City, USA")
                     Text("“From your Brother Muhammad Hafiz Abdul-Qayyum in the Wilderness of North America.”")
                     Text("For humanity. If Allah wills.")
@@ -126,7 +126,7 @@ struct AboutView: View {
                     Text("Black American Heritage Flag: designed by Melvin Charles and Gleason T. Jackson (1967). SVG rendition by Xophe84, Wikimedia Commons (CC0).")
                     Text("Data: Frankfurter and its official-source providers. Crypto: Swiss Federal Tax Administration (ESTV). These are dated reference conversions, not executable trading quotes. Both source dates are shown. Different dates are labeled as indicative comparisons.")
                     Text("Metals use troy ounces (31.1034768 g). Crypto uses coin units. Satoshi: 100,000,000 per BTC. Drops: 1,000,000 per XRP. Subunit outputs round to whole units. Dealer premiums, transaction fees and spreads are excluded. Flags identify currencies and are not a statement about sovereignty.")
-                    Text("Only reference-rate snapshots are cached on this device, reused for six hours. A failed refresh may use a saved quote up to seven days old, clearly labeled. Amounts and conversion history are not saved. No ads or analytics SDKs are included.")
+                    Text("Only reference-rate snapshots are cached on this device, reused for six hours. A failed refresh may use a saved quote with its date and a warning if it is more than seven days old. Amounts and conversion history are not saved. No ads or analytics SDKs are included.")
                     Link("Frankfurter sources and documentation", destination: URL(string: "https://frankfurter.dev")!)
                 }.font(.body).foregroundColor(Theme.muted).padding(20).frame(maxWidth: 600)
             }.background(Theme.cream).navigationTitle("About & sources").navigationBarTitleDisplayMode(.inline)
