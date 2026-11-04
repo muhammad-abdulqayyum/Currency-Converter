@@ -1,0 +1,21 @@
+{
+  "name": "currency-converter-web",
+  "private": true,
+  "scripts": {
+    "build": "ng build",
+    "start": "ng serve"
+  },
+  "dependencies": {
+    "@angular/core": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "rxjs": "^7.8.2",
+    "@angular/forms": "^21.0.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.0.0",
+    "@angular/cli": "^21.0.0",
+    "typescript": "~5.9.2"
+  }
+}
