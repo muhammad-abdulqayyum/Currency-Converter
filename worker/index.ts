@@ -10,13 +10,17 @@ export async function quote(code: string, request: Request): Promise<Quote> {
   const parent = code === 'SAT' ? 'BTC' : code === 'DROP' ? 'XRP' : code;
   const cacheKey = new Request(new URL('/_rates/' + parent, request.url));
   const cache = (globalThis as any).caches?.default;
-  const saved = await cache?.match(cacheKey);
-  let result: Quote;
-  if (saved) result = { ...await saved.json() as Quote, cached: true };
-  else {
+  let result: Quote | undefined;
+  try {
+    const saved = await cache?.match(cacheKey);
+    if (saved) result = { ...await saved.json() as Quote, cached: true };
+  } catch (error) {
+    console.warn('Rate cache read failed', { asset: parent, error: String(error) });
+  }
+  if (!result) {
     const endpoint = `https://api.frankfurter.dev/v2/rate/USD/${parent}?expand=providers${asset.kind === 'crypto' ? '&providers=ESTV' : ''}`;
     const response = await fetch(endpoint, { signal: AbortSignal.timeout(10000), headers: { Accept: 'application/json' }, redirect: 'error' });
-    if (!response.ok) throw new Error('Reference rate unavailable');
+    if (!response.ok) throw new Error(`Frankfurter returned HTTP ${response.status}`);
     const raw = await response.text();
     if (raw.length > 65536) throw new Error('Invalid provider response');
     const data = JSON.parse(raw);
@@ -27,7 +31,11 @@ export async function quote(code: string, request: Request): Promise<Quote> {
     if (decimal(rate)[0] <= 0n) throw new Error('Invalid provider rate');
     if (asset.kind === 'crypto' && !data.providers?.some((p: any) => p.key === 'ESTV' && !p.excluded)) throw new Error('Missing crypto reference source');
     result = { code: parent, rate, date: data.date, source: asset.kind === 'crypto' ? 'Swiss Federal Tax Administration (ESTV) via Frankfurter' : 'Frankfurter official-source reference rates', fetchedAt: new Date().toISOString() };
-    await cache?.put(cacheKey, Response.json(result, { headers: { 'Cache-Control': 'public, max-age=900' } }));
+    try {
+      await cache?.put(cacheKey, Response.json(result, { headers: { 'Cache-Control': 'public, max-age=900' } }));
+    } catch (error) {
+      console.warn('Rate cache write failed', { asset: parent, error: String(error) });
+    }
   }
   return { ...result, code, rate: code === 'SAT' ? convert(result.rate, '1', '100000000', 24) : code === 'DROP' ? convert(result.rate, '1', '1000000', 24) : result.rate };
 }
@@ -47,6 +55,9 @@ export default {
       const target = assets.find(a => a.code === to)!;
       const places = target.kind === 'world' ? (['JPY','KRW','CLP','ISK'].includes(to) ? 0 : ['BHD','KWD','OMR','JOD','TND'].includes(to) ? 3 : 2) : to === 'SAT' || to === 'DROP' ? 0 : 8;
       return json({ amount, from, to, result: convert(amount, quotes[0].rate, quotes[1].rate, places), quotes, referenceOnly: true });
-    } catch { return json({ error: 'A recent reference rate is unavailable. Please try another pair or try again later.' }, 503); }
+    } catch (error) {
+      console.error('Conversion failed', { from, to, error: String(error) });
+      return json({ error: 'A recent reference rate is unavailable. Please try another pair or try again later.' }, 503);
+    }
   }
 };
