@@ -13,8 +13,7 @@
             "index": "src/index.html",
             "tsConfig": "tsconfig.json",
             "assets": [
-              {"glob": "category_metals.svg", "input": "src/icons", "output": "icons"},
-              {"glob": "category_crypto.svg", "input": "src/icons", "output": "icons"}
+              {"glob": "*", "input": "src/icons", "output": "icons"}
             ],
             "styles": [
               "src/styles.css"
