@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 import javax.net.ssl.HttpsURLConnection;
 
 /** Only rate snapshots are persisted. Amounts and conversion history are not stored. */
@@ -38,9 +42,17 @@ public final class RateRepository {
             catch (Exception ignored) { cache.edit().remove(key).remove(key + ".time").apply(); }
         }
         try {
-            String body = download(asset);
-            Quote quote = parse(new JSONObject(body), asset, false, false, now);
-            cache.edit().putString(key, compact(new JSONObject(body))).putLong(key + ".time", now).apply();
+            JSONObject body = new JSONObject(download(asset, ""));
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String today = format.format(new Date(now));
+            String date = body.getString("date");
+            if (date.compareTo(today) > 0) {
+                // The latest feed can include a provider already reporting tomorrow's date.
+                body = new JSONObject(download(asset, "&date=" + today));
+            }
+            Quote quote = parse(body, asset, false, false, now);
+            cache.edit().putString(key, compact(body)).putLong(key + ".time", now).apply();
             return quote;
         } catch (Exception networkError) {
             if (stored != null) {
@@ -89,10 +101,10 @@ public final class RateRepository {
                 : "Frankfurter · official-source reference rates" + (names.length() > 0 ? "\nProviders: " + names + (providerCount > 3 ? " + " + (providerCount - 3) + " more" : "") : "");
         return new Quote(rate, date, source, saved, offline, age);
     }
-    private String download(Asset asset) throws Exception {
+    private String download(Asset asset, String dateQuery) throws Exception {
         String endpoint = "https://api.frankfurter.dev/v2/rate/USD/" + asset.code + "?expand=providers";
         if (asset.kind == Asset.Kind.CRYPTO) endpoint += "&providers=ESTV";
-        HttpsURLConnection connection = (HttpsURLConnection) new URL(endpoint).openConnection();
+        HttpsURLConnection connection = (HttpsURLConnection) new URL(endpoint + dateQuery).openConnection();
         connection.setConnectTimeout(10000); connection.setReadTimeout(10000);
         connection.setInstanceFollowRedirects(false);
         connection.setRequestProperty("Accept", "application/json");
