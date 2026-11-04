@@ -21,8 +21,8 @@ public struct Quote {
     public let age: Int
     public func details(code: String) -> String {
         if code == "USD" { return "USD · common reference base" }
-        return "\(code) · \(date)" + (age > 3 ? " · older reference (\(age) days)" : "") + "\n" +
-            (offline ? "Saved rate · connection unavailable" : saved ? "Saved rate · reused locally" : "Reference rate retrieved") + "\n" + source
+        return "\(code) · \(date)" + (age > 7 ? " · Older rate. The current rate may differ." : "") + "\n" +
+            (offline ? "Saved rate · refresh unavailable" : saved ? "Saved rate · reused locally" : "Reference rate retrieved") + "\n" + source
     }
 }
 public enum RatePolicy {
@@ -33,7 +33,7 @@ public enum RatePolicy {
         guard date.range(of: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", options: .regularExpression) != nil,
               let d = f.date(from: date), f.string(from: d) == date else { throw ConverterError.date }
         let age = Int(floor(now.timeIntervalSince1970 / 86400) - floor(d.timeIntervalSince1970 / 86400))
-        guard (0...7).contains(age) else { throw ConverterError.date }; return age
+        guard age >= 0 else { throw ConverterError.date }; return age
     }
     public static func quote(_ data: Data, for asset: Asset, now: Date, saved: Bool = false, offline: Bool = false) throws -> Quote {
         guard data.count <= 65536 else { throw ConverterError.rate }
@@ -57,17 +57,31 @@ public protocol SnapshotStore {
     func write(_ snapshot: Snapshot, code: String)
 }
 public final class FileSnapshotStore: SnapshotStore {
-    private let directory: URL
+    private let directory: URL, legacyDirectory: URL
     public init() {
-        directory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("ReferenceRates", isDirectory: true)
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let manager = FileManager.default
+        directory = manager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ReferenceRates", isDirectory: true)
+        legacyDirectory = manager.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("ReferenceRates", isDirectory: true)
     }
     public func read(_ code: String) -> Snapshot? {
-        guard let data = try? Data(contentsOf: directory.appendingPathComponent(code + ".json")), data.count < 100000 else { return nil }
-        return try? JSONDecoder().decode(Snapshot.self, from: data)
+        let name = code + ".json"
+        for location in [directory, legacyDirectory] {
+            guard let data = try? Data(contentsOf: location.appendingPathComponent(name)), data.count < 100000,
+                  let snapshot = try? JSONDecoder().decode(Snapshot.self, from: data) else { continue }
+            if location == legacyDirectory { write(snapshot, code: code) }
+            return snapshot
+        }
+        return nil
     }
     public func write(_ snapshot: Snapshot, code: String) {
-        if let data = try? JSONEncoder().encode(snapshot) { try? data.write(to: directory.appendingPathComponent(code + ".json"), options: .atomic) }
+        do {
+            var folder = directory
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            var values = URLResourceValues()
+            values.isExcludedFromBackup = true
+            try folder.setResourceValues(values)
+            try JSONEncoder().encode(snapshot).write(to: folder.appendingPathComponent(code + ".json"), options: .atomic)
+        } catch { /* A storage failure should not prevent the current conversion. */ }
     }
 }
 private final class NoRedirects: NSObject, URLSessionTaskDelegate {
@@ -76,9 +90,27 @@ private final class NoRedirects: NSObject, URLSessionTaskDelegate {
 }
 public actor RateRepository {
     public typealias Download = (Asset) async throws -> Data
-    private let store: SnapshotStore, download: Download
-    public init(store: SnapshotStore = FileSnapshotStore(), download: @escaping Download = RateRepository.download) {
-        self.store = store; self.download = download
+    public typealias History = (Asset, Date) async throws -> Data
+    private let store: SnapshotStore
+    private let latest: (Asset) async throws -> (Data, Date?)
+    private let history: History
+    public init(store: SnapshotStore = FileSnapshotStore(), download: Download? = nil, history: History? = nil) {
+        self.store = store
+        if let download {
+            latest = { (try await download($0), nil) }
+            self.history = history ?? { _, _ in throw ConverterError.unavailable }
+        } else {
+            latest = { try await RateRepository.request($0) }
+            self.history = history ?? { asset, now in
+                let formatter = DateFormatter()
+                formatter.locale = Conversion.posix
+                formatter.timeZone = TimeZone(secondsFromGMT: 0)
+                formatter.dateFormat = "yyyy-MM-dd"
+                let from = formatter.string(from: now.addingTimeInterval(-7 * 86400))
+                let to = formatter.string(from: now)
+                return try await RateRepository.request(asset, range: "&from=\(from)&to=\(to)").0
+            }
+        }
     }
     public func get(_ asset: Asset, now: Date = Date()) async throws -> Quote {
         if asset.isSubunit {
@@ -93,17 +125,38 @@ public actor RateRepository {
         if let s = stored, now >= s.fetchedAt, now.timeIntervalSince(s.fetchedAt) < RatePolicy.ttl,
            let q = try? RatePolicy.quote(s.data, for: asset, now: now, saved: true) { return q }
         do {
-            let data = try await download(asset)
-            let quote = try RatePolicy.quote(data, for: asset, now: now)
-            store.write(Snapshot(data: data, fetchedAt: now), code: asset.code); return quote
+            let (latestData, serverDate) = try await latest(asset)
+            let referenceTime = serverDate ?? now
+            let data: Data
+            let quote: Quote
+            if let valid = try? RatePolicy.quote(latestData, for: asset, now: referenceTime) {
+                (data, quote) = (latestData, valid)
+            } else {
+                let response = try await history(asset, referenceTime)
+                let entries = try JSONSerialization.jsonObject(with: response) as? [[String: Any]] ?? []
+                let newest = entries.compactMap { entry -> (Data, Quote)? in
+                    guard let data = try? JSONSerialization.data(withJSONObject: entry),
+                          let quote = try? RatePolicy.quote(data, for: asset, now: referenceTime) else { return nil }
+                    return (data, quote)
+                }.max { $0.1.date < $1.1.date }
+                guard let newest else { throw ConverterError.unavailable }
+                (data, quote) = newest
+            }
+            if let current = store.read(asset.code),
+               let saved = try? RatePolicy.quote(current.data, for: asset, now: referenceTime, saved: true),
+               saved.date > quote.date { return saved }
+            store.write(Snapshot(data: data, fetchedAt: referenceTime), code: asset.code)
+            return quote
         } catch {
-            if let s = stored, let quote = try? RatePolicy.quote(s.data, for: asset, now: now, saved: true, offline: true) { return quote }
+            if let s = store.read(asset.code), let quote = try? RatePolicy.quote(s.data, for: asset, now: max(now, s.fetchedAt), saved: true, offline: true) { return quote }
             throw ConverterError.unavailable
         }
     }
-    public static func download(_ asset: Asset) async throws -> Data {
+    private static func request(_ asset: Asset, range: String = "") async throws -> (Data, Date?) {
         guard asset.code.range(of: "^[A-Z]{3}$", options: .regularExpression) != nil else { throw ConverterError.pair }
-        let endpoint = "https://api.frankfurter.dev/v2/rate/USD/\(asset.code)?expand=providers" + (asset.category == .crypto ? "&providers=ESTV" : "")
+        let path = range.isEmpty ? "/v2/rate/USD/\(asset.code)?expand=providers"
+            : "/v2/rates?base=USD&quotes=\(asset.code)&expand=providers" + range
+        let endpoint = "https://api.frankfurter.dev" + path + (asset.category == .crypto ? "&providers=ESTV" : "")
         let config = URLSessionConfiguration.ephemeral; config.timeoutIntervalForRequest = 10; config.timeoutIntervalForResource = 20; config.urlCache = nil
         let session = URLSession(configuration: config, delegate: NoRedirects(), delegateQueue: nil)
         defer { session.invalidateAndCancel() }
@@ -115,6 +168,11 @@ public actor RateRepository {
         for try await byte in bytes {
             guard data.count < 65536 else { throw ConverterError.rate }; data.append(byte)
         }
-        return data
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+        let serverDate = response.value(forHTTPHeaderField: "Date").flatMap { formatter.date(from: $0) }
+        return (data, serverDate)
     }
 }

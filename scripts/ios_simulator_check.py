@@ -50,6 +50,6 @@ for label,device in matrix:
  time.sleep(2)
  subprocess.run(['xcrun','simctl','io',udid,'screenshot',str(OUT/(label+'.png'))],check=True)
  print('PASS: '+label+' '+device['name'],flush=True)
-(OUT/'validation.json').write_text(json.dumps({'deploymentTarget':'15.0','version':'4.0.4','simulators':[{'name':d['name'],'label':label} for label,d in matrix],
+(OUT/'validation.json').write_text(json.dumps({'deploymentTarget':'15.0','version':'4.0.5','simulators':[{'name':d['name'],'label':label} for label,d in matrix],
  'uiChecks':'passed','minimumOSRuntimeTested':False,'fixtureQuotes':'Debug UI tests only; not in Release'},indent=2))
 print('ALL IOS SIMULATOR CHECKS PASSED',flush=True)

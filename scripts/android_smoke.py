@@ -65,9 +65,11 @@ print('PASS: candidate installed' if os.environ.get('SKIP_UPGRADE') == '1' else 
 adb('shell','wm','size','420x900');adb('shell','wm','density','160');adb('shell','input','keyevent','82');adb('logcat','-c')
 now=int(time.time()*1000);day=datetime.datetime.now(datetime.timezone.utc).date();prefs=['<map>']
 for code,rate in {'GBP':'0.8','BRL':'5','PHP':'60','XAU':'0.00025','XAG':'0.025','BTC':'0.00001','XRP':'0.5'}.items():
- date=(day-datetime.timedelta(days=1) if code=='BTC' else day).isoformat()
+ age = 120 if code == 'GBP' and os.environ.get('CANDIDATE_VERSION') == '4.0.5' else 1 if code == 'BTC' else 0
+ date=(day-datetime.timedelta(days=age)).isoformat()
+ fetched_at = now - age * 86400000 if age == 120 else now
  body=json.dumps({'base':'USD','quote':code,'rate':rate,'date':date,'providers':[{'key':'ESTV' if code in ['BTC','XRP'] else 'ECB'}]})
- prefs.append('<string name="v3.'+code+'">'+esc.escape(body)+'</string><long name="v3.'+code+'.time" value="'+str(now)+'"/>')
+ prefs.append('<string name="v3.'+code+'">'+esc.escape(body)+'</string><long name="v3.'+code+'.time" value="'+str(fetched_at)+'"/>')
 prefs.append('</map>');(OUT/'fixture.xml').write_text(''.join(prefs));adb('push',str(OUT/'fixture.xml'),'/data/local/tmp/fixture.xml');adb('shell','run-as',PKG,'mkdir','-p','shared_prefs');adb('shell','run-as',PKG,'cp','/data/local/tmp/fixture.xml','shared_prefs/reference_rates.xml')
 try:
  launch();time.sleep(4);shot('home');assert b'VERSION 4' in ui();check_fit()
@@ -83,8 +85,18 @@ try:
  choose('from_asset','crypto_tab','XRP','XRP');choose('to_asset','crypto_tab','Drops (XRP)','DROP');check('100,000,000 DROP')
  top();tap('swap');check('0.0001 XRP')
  choose('from_asset','crypto_tab','Satoshi (Bitcoin)','SAT');choose('to_asset','crypto_tab','Drops (XRP)','DROP');check('50,000 DROP');assert b'Different reference dates' in ui()
- launch();bottom();bottom();shot('footer');tap('about');shot('about');assert b'Version 4.0.4' in ui();adb('shell','input','keyevent','4')
- adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);tap('from_asset');tap('crypto_tab');shot('large-crypto-picker');tap('asset_search');adb('shell','input','text','BCH');adb('shell','input','keyevent','4');tap('Bitcoin Cash',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert b'Version 4.0.4' in ui();adb('shell','input','keyevent','4')
+ launch();bottom();bottom();shot('footer');tap('about');shot('about');assert os.environ.get('CANDIDATE_VERSION', '4.0.4').encode() in ui();adb('shell','input','keyevent','4')
+ adb('shell','settings','put','system','font_scale','1.3');adb('shell','wm','size','360x800');launch();shot('large-text');tap('from_asset');tap('metals_tab');shot('large-picker');tap('Gold',True);tap('from_asset');tap('crypto_tab');shot('large-crypto-picker');tap('asset_search');adb('shell','input','text','BCH');adb('shell','input','keyevent','4');tap('Bitcoin Cash',True);bottom();bottom();shot('large-footer');assert b'Black American Heritage Flag' in ui();tap('about');assert os.environ.get('CANDIDATE_VERSION', '4.0.4').encode() in ui();adb('shell','input','keyevent','4')
+ if os.environ.get('CANDIDATE_VERSION') == '4.0.5':
+  adb('shell','svc','wifi','disable');adb('shell','svc','data','disable')
+  try:
+   launch()
+   choose('to_asset','world_tab','British Pound','GBP')
+   check('80.00 GBP')
+   assert b'Older rate. The current rate may differ.' in ui()
+   assert b'Saved rate' in ui()
+  finally:
+   adb('shell','svc','wifi','enable');adb('shell','svc','data','enable')
  logs=adb('logcat','-d');(OUT/'logcat.txt').write_bytes(logs);assert b'FATAL EXCEPTION' not in logs
  print('ALL DEVICE CHECKS PASSED',flush=True)
  for name in ['home','metals-picker','crypto-picker','footer','large-picker','large-crypto-picker','large-footer']:
