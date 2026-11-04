@@ -3,6 +3,10 @@ import { Component, signal } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { assets, Asset } from '../../shared/assets';
+const searchAliases: Partial<Record<string, string>> = {
+  USD: 'US Dollar',
+};
+
 @Component({
   selector: 'app-root', standalone: true, imports: [FormsModule, NgTemplateOutlet],
   template: `
@@ -54,7 +58,12 @@ class App {
     return 'icons/' + coin.toLowerCase() + '.png';
   }
   asset(code:string):Asset {return assets.find(a=>a.code===code)!;}
-  filtered(){const q=this.search.toLowerCase();return assets.filter(a=>a.kind===this.kind && (a.code+' '+a.name).toLowerCase().includes(q));}
+  filtered() {
+    const query = this.search.trim().toLowerCase();
+    return assets.filter(asset => asset.kind === this.kind &&
+      (`${asset.code} ${asset.name}`.toLowerCase().includes(query) ||
+        searchAliases[asset.code]?.toLowerCase().includes(query)));
+  }
   invalidate(){this.version++;this.result.set(null);this.error.set('');this.loading.set(false);}
   openPicker(side:'from'|'to'){this.picking.set(side);this.kind=this.asset(this[side]).kind;this.search='';setTimeout(()=>document.querySelector<HTMLInputElement>('.search')?.focus());}
   closePicker(){this.picking.set('');}
