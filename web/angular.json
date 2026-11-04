@@ -12,6 +12,10 @@
             "browser": "src/main.ts",
             "index": "src/index.html",
             "tsConfig": "tsconfig.json",
+            "assets": [
+              {"glob": "category_metals.png", "input": "../project/app/src/main/res/drawable-nodpi", "output": "icons"},
+              {"glob": "category_crypto.png", "input": "../project/app/src/main/res/drawable-nodpi", "output": "icons"}
+            ],
             "styles": [
               "src/styles.css"
             ],
