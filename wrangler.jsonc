@@ -1,4 +1,5 @@
 {
+  "observability": { "logs": { "enabled": true, "invocation_logs": true, "persist": true } },
   "name": "universal-currency-converter",
   "main": "worker/index.ts",
   "compatibility_date": "2026-10-29",

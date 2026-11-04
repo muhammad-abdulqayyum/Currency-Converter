@@ -19,7 +19,7 @@ export async function quote(code: string, request: Request): Promise<Quote> {
   }
   if (!result) {
     const endpoint = `https://api.frankfurter.dev/v2/rate/USD/${parent}?expand=providers${asset.kind === 'crypto' ? '&providers=ESTV' : ''}`;
-    const response = await fetch(endpoint, { signal: AbortSignal.timeout(10000), headers: { Accept: 'application/json' }, redirect: 'error' });
+    const response = await fetch(endpoint, { signal: AbortSignal.timeout(10000), headers: { Accept: 'application/json' }, redirect: 'manual' });
     if (!response.ok) throw new Error(`Frankfurter returned HTTP ${response.status}`);
     const raw = await response.text();
     if (raw.length > 65536) throw new Error('Invalid provider response');
