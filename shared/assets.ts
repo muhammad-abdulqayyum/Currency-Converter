@@ -1,6 +1,6 @@
 export interface Asset { code: string; name: string; icon: string; kind: "world" | "metal" | "crypto"; }
 export const assets: Asset[] = [
-  {code:"USD",name:"US Dollar",icon:"🇺🇸",kind:"world"},
+  {code:"USD",name:"United States Dollar",icon:"🇺🇸",kind:"world"},
   {
     "code": "AFN",
     "name": "Afghan Afghani",
