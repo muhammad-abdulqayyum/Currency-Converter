@@ -2,9 +2,17 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { countryCurrencies, normalizeSearch } from './country-search';
 import { assets, Asset } from '../../shared/assets';
 const searchAliases: Partial<Record<string, string>> = {
   USD: 'US Dollar',
+  EUR: 'Europe',
+  BTC: 'Bitcoins',
+  ETH: 'Ethereums',
+  XRP: 'Ripple Ripples XRPs',
+  LTC: 'Litecoins',
+  BCH: 'Bitcoin Cash coins',
+  SAT: 'Satoshis',
 };
 
 @Component({
@@ -88,10 +96,13 @@ class App {
     return asset.kind === 'metal' ? `troy oz of ${asset.name}` : code;
   }
   filtered() {
-    const query = this.search.trim().toLowerCase();
+    const query = normalizeSearch(this.search);
+    const countries = this.kind === 'world' ? countryCurrencies(query) : new Set<string>();
+    const rank = (code: string) => code.toLowerCase() === query ? 0 : countries.has(code) ? 1 : 2;
     return assets.filter(asset => asset.kind === this.kind &&
-      (`${asset.code} ${asset.name}`.toLowerCase().includes(query) ||
-        searchAliases[asset.code]?.toLowerCase().includes(query)));
+      (countries.has(asset.code) || normalizeSearch(`${asset.code} ${asset.name}`).includes(query) ||
+        normalizeSearch(searchAliases[asset.code] ?? '').includes(query)))
+      .sort((left, right) => rank(left.code) - rank(right.code));
   }
   invalidate(){this.version++;this.result.set(null);this.error.set('');this.loading.set(false);}
   openPicker(side:'from'|'to'){this.picking.set(side);this.kind=this.asset(this[side]).kind;this.search='';setTimeout(()=>document.querySelector<HTMLInputElement>('.search')?.focus());}

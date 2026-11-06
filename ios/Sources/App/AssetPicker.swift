@@ -65,13 +65,25 @@ struct AssetPicker: View {
         _category = State(initialValue: chosen.category)
     }
     private var matches: [Asset] {
-        let query = search.trimmingCharacters(in: .whitespacesAndNewlines)
-        return assets.filter { asset in
+        let query = CountrySearch.normalize(search)
+        let countries = category == .world ? CountrySearch.currencies(for: query) : []
+        let results = assets.filter { asset in
             guard asset.category == category else { return false }
             return query.isEmpty
-                || (asset.name + " " + asset.code).localizedCaseInsensitiveContains(query)
-                || (asset.code == "USD" && "US Dollar".localizedCaseInsensitiveContains(query))
+                || countries.contains(asset.code)
+                || CountrySearch.normalize(asset.name + " " + asset.code).contains(query)
+                || (asset.code == "USD" && "us dollar".contains(query))
+                || (asset.code == "EUR" && "europe".contains(query))
+                || (asset.code == "BTC" && "bitcoins".contains(query))
+                || (asset.code == "ETH" && "ethereums".contains(query))
+                || (asset.code == "XRP" && "ripple ripples xrps".contains(query))
+                || (asset.code == "LTC" && "litecoins".contains(query))
+                || (asset.code == "BCH" && "bitcoin cash coins".contains(query))
+                || (asset.code == "SAT" && "satoshis".contains(query))
         }
+        return results.filter { $0.code.lowercased() == query }
+            + results.filter { $0.code.lowercased() != query && countries.contains($0.code) }
+            + results.filter { $0.code.lowercased() != query && !countries.contains($0.code) }
     }
     var body: some View {
         NavigationView {
