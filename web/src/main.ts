@@ -10,6 +10,10 @@ const searchAliases: Partial<Record<string, string>> = {
 @Component({
   selector: 'app-root', standalone: true, imports: [FormsModule, NgTemplateOutlet],
   styles: [`
+    .pair { grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr); }
+    .swap { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; color: #244e43;
+      background: radial-gradient(circle, white 14px, #e3e8de 14px, #e3e8de 15px, transparent 16px); }
+    .convert { text-align: center; font-weight: 600; }
     .footer-credit { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 4px 12px; line-height: 1.6; }
     .footer-author { display: inline-flex; align-items: center; gap: 6px; }
     .footer-credit .heritage-flag { flex: none; object-fit: contain; }
@@ -42,9 +46,11 @@ const searchAliases: Partial<Record<string, string>> = {
   <section class="converter" aria-label="Currency converter"><div class="card-top"><h2>Make the connection</h2><span class="badge">REFERENCE RATES</span></div>
   <form (ngSubmit)="calculate()"><label for="amount">Amount to convert</label><div class="amount"><input id="amount" name="amount" inputmode="decimal" [(ngModel)]="amount" (ngModelChange)="invalidate()" maxlength="49" autocomplete="off" required><span>{{from}}</span></div>
   <div class="pair"><button type="button" class="asset" (click)="openPicker('from')"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: asset(from)}"></ng-container><span><small>FROM</small><strong>{{from}}</strong><span class="asset-name">{{asset(from).name}}</span></span><span class="chevron">⌄</span></button>
-  <button type="button" class="swap" aria-label="Swap currencies" (click)="swap()">⇄</button>
+  <button type="button" class="swap" aria-label="Swap currencies" (click)="swap()">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h12m-3-3 3 3-3 3M16 13H4m3-3-3 3 3 3"/></svg>
+  </button>
   <button type="button" class="asset" (click)="openPicker('to')"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: asset(to)}"></ng-container><span><small>TO</small><strong>{{to}}</strong><span class="asset-name">{{asset(to).name}}</span></span><span class="chevron">⌄</span></button></div>
-  <button class="convert" type="submit" [disabled]="loading()">{{loading() ? 'Getting reference rates…' : 'Convert now'}} <span>↗</span></button></form>
+  <button class="convert" type="submit" [disabled]="loading()">{{loading() ? 'Getting reference rates…' : 'Convert'}}</button></form>
   <div class="result" aria-live="polite">@if(error()){<p class="error" role="alert">{{error()}}</p>} @else if(result()){<small>{{result().amount}} {{resultUnit(result().from)}} equals</small><div class="value">{{result().result}} @if (asset(result().to).kind === 'metal') { {{resultUnit(result().to)}} } @else { <span>{{result().to}}</span> }</div>@for(q of result().quotes; track $index){<p class="quote">{{q.code}} · {{q.date}} · {{q.source}} {{q.cached ? '· cached' : ''}}</p>}} @else {<span class="result-placeholder">Your next perspective starts here.</span>}</div>
   <p class="note">Dated reference values, not live trading quotes. Metal units are troy ounces. Rates may have different effective dates; provider coverage varies.</p></section>
   <div class="features"><div><span>01</span><strong>Across borders</strong><p>World currencies in one searchable collection.</p></div><div><span>02</span><strong>Beyond currencies</strong><p>Gold, silver, platinum and palladium.</p></div><div><span>03</span><strong>Into digital</strong><p>Crypto and smaller denominations.</p></div></div>
