@@ -8,7 +8,7 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 
 Android and iOS can reuse a verified saved quote offline regardless of age. Both show the quote date and warn after seven days.
 
-The 4.0.5 web source displays metal conversions as troy ounces of the named metal. The live site reflects the latest successful Cloudflare deployment.
+**4.0.5 is the latest version for Android, iOS, and web.** The [live web app](https://universalconverter.app/) runs 4.0.5 on Cloudflare, with the Black American Heritage Flag in the footer and metal results displayed in troy ounces of the named metal.
 
 ## Version 4.0.4 history
 
