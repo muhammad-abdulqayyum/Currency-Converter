@@ -4,6 +4,14 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 
 **[Download Version 4.0](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/master/android-installer-file/Currency-Converter-4.0.apk)** · Android 6.0+ · debug-signed preview.
 
+## Country search update
+
+- In either **World** picker, `Pale` shows **Palestine · Choose a currency** first and **Nepalese Rupee (NPR)** second.
+- Searching for `Palestine`, `Palestinian Territories`, `PS`, or `PSE` shows the Palestine chooser. Expand it to select ILS, JOD, or USD. Those currencies remain searchable by name or code.
+- England, Scotland, Wales, North Ireland, and Northern Ireland find British Pound (GBP). Ireland on its own finds Euro (EUR).
+
+Available on the [live web app](https://universalconverter.app/) and in the Android 4.0.6 debug preview and iOS source. See [Try it](../README.md#try-it) for downloads and build instructions.
+
 ## Version 4
 
 Choose **From** and **To** independently. Both pickers offer **World**, **Metals**, and **Crypto** tabs and search by name or code. Tap an asset to select it immediately. **Swap** reverses the pair while keeping the entered number; the source unit changes visibly.
