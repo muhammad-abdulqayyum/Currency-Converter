@@ -2,7 +2,7 @@
 
 By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
-**[Download the archived Android 4.0.4 preview](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/develop/android-installer-file/Currency-Converter-4.0.4.apk)** · Android 6.0+ · debug-signed preview. For 4.0.5 builds, see [Android build artifacts](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml).
+**[Download Android 4.0.5](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/42170075311/artifacts/13480672717)** · Android 6.0+ · debug-signed preview. Sign in to GitHub, download the ZIP, and extract `app-debug.apk`. If the artifact has expired, see the [Android build workflow](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml) for newer builds.
 
 ## Version 4.0.5 on Android, iOS, and web
 
