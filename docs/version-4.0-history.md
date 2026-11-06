@@ -10,7 +10,7 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 - Searching for `Palestine`, `Palestinian Territories`, `PS`, or `PSE` shows the Palestine chooser. Expand it to select ILS, JOD, or USD. Those currencies remain searchable by name or code.
 - England, Scotland, Wales, North Ireland, and Northern Ireland find British Pound (GBP). Ireland on its own finds Euro (EUR).
 
-Available on the [live web app](https://universalconverter.app/) and in the Android 4.0.6 debug preview and iOS source. See [Try it](../README.md#try-it) for downloads and build instructions.
+Available on the [live web app](https://universalconverter.app/) and in the Android 4.0.7 debug preview (build 48) and iOS source. See [Try it](../README.md#try-it) for downloads and build instructions.
 
 ## Version 4
 
