@@ -75,7 +75,7 @@
   "FO": {"alpha3":"FRO","name":"Faroe Islands","aliases":[],"currencies":["DKK"]},
   "FR": {"alpha3":"FRA","name":"France","aliases":[],"currencies":["EUR"]},
   "GA": {"alpha3":"GAB","name":"Gabon","aliases":[],"currencies":["XAF"]},
-  "GB": {"alpha3":"GBR","name":"United Kingdom","aliases":["UK","Great Britain"],"currencies":["GBP"]},
+  "GB": {"alpha3":"GBR","name":"United Kingdom","aliases":["UK","Great Britain","Scotland","Wales"],"currencies":["GBP"]},
   "GD": {"alpha3":"GRD","name":"Grenada","aliases":[],"currencies":["XCD"]},
   "GE": {"alpha3":"GEO","name":"Georgia","aliases":[],"currencies":["GEL"]},
   "GF": {"alpha3":"GUF","name":"French Guiana","aliases":[],"currencies":["EUR"]},
