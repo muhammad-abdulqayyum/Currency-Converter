@@ -114,6 +114,7 @@ public class MainActivity extends Activity {
     private boolean matchesAssetSearch(Asset asset, String query) {
         String searchable = asset.name + " " + asset.code;
         if ("USD".equals(asset.code)) searchable += " US Dollar";
+        if ("EUR".equals(asset.code)) searchable += " Europe";
         switch (asset.code) {
             case "BTC": searchable += " Bitcoins"; break;
             case "ETH": searchable += " Ethereums"; break;

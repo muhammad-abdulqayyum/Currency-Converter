@@ -6,6 +6,7 @@ import { countryCurrencies, normalizeSearch } from './country-search';
 import { assets, Asset } from '../../shared/assets';
 const searchAliases: Partial<Record<string, string>> = {
   USD: 'US Dollar',
+  EUR: 'Europe',
   BTC: 'Bitcoins',
   ETH: 'Ethereums',
   XRP: 'Ripple Ripples XRPs',

@@ -73,6 +73,7 @@ struct AssetPicker: View {
                 || countries.contains(asset.code)
                 || CountrySearch.normalize(asset.name + " " + asset.code).contains(query)
                 || (asset.code == "USD" && "us dollar".contains(query))
+                || (asset.code == "EUR" && "europe".contains(query))
                 || (asset.code == "BTC" && "bitcoins".contains(query))
                 || (asset.code == "ETH" && "ethereums".contains(query))
                 || (asset.code == "XRP" && "ripple ripples xrps".contains(query))
