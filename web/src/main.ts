@@ -71,7 +71,13 @@ const searchAliases: Partial<Record<string, string>> = {
       <a href="https://github.com/muhammad-abdulqayyum/Currency-Converter">Source code</a></div>
     </div>
   </footer>
-  @if(picking()) {<div class="overlay" (click)="closePicker()"><section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" (click)="$event.stopPropagation()" (keydown.escape)="closePicker()"><div class="card-top"><h2 id="picker-title">Choose an asset</h2><button type="button" class="close" aria-label="Close asset picker" (click)="closePicker()">×</button></div><input class="search" aria-label="Search assets" placeholder="Search name or code…" [(ngModel)]="search"><div class="tabs">@for(k of kinds;track k){<button type="button" [class.active]="kind === k" (click)="kind=k"><img class="category-icon" [src]="k === 'world' ? 'icons/category_world.png' : k === 'metal' ? 'icons/category_metals.png' : 'icons/category_crypto.png'" width="20" height="20" alt="">{{k === 'world' ? 'World' : k === 'metal' ? 'Metals' : 'Crypto'}}</button>}</div><div class="asset-list">@for(a of filtered();track a.code){<button type="button" class="asset" (click)="select(a.code)"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: a}"></ng-container><span><strong>{{a.code}}</strong><span class="asset-name">{{a.name}}{{a.kind === 'metal' ? ' · troy oz' : ''}}</span></span><span class="chevron">↗</span></button>} @empty {<p>No matching assets in this category.</p>}</div></section></div>}
+  @if(picking()) {<div class="overlay" (click)="closePicker()"><section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" (click)="$event.stopPropagation()" (keydown.escape)="closePicker()"><div class="card-top"><h2 id="picker-title">Choose an asset</h2><button type="button" class="close" aria-label="Close asset picker" (click)="closePicker()">×</button></div><input class="search" aria-label="Search assets" placeholder="Search name or code…" [(ngModel)]="search" (ngModelChange)="palestineOpen = false"><div class="tabs">@for(k of kinds;track k){<button type="button" [class.active]="kind === k" (click)="kind=k; palestineOpen=false"><img class="category-icon" [src]="k === 'world' ? 'icons/category_world.png' : k === 'metal' ? 'icons/category_metals.png' : 'icons/category_crypto.png'" width="20" height="20" alt="">{{k === 'world' ? 'World' : k === 'metal' ? 'Metals' : 'Crypto'}}</button>}</div><div class="asset-list">@if (palestineMatch()) {
+    <button type="button" class="asset" (click)="palestineOpen = !palestineOpen" [attr.aria-expanded]="palestineOpen">
+      <img class="world-flag" src="flags/ps.svg" alt="">
+      <span><strong>Palestine</strong><span class="asset-name">Choose a currency</span></span>
+      <span class="chevron">{{palestineOpen ? '⌃' : '⌄'}}</span>
+    </button>
+  } @for(a of filtered();track a.code){<button type="button" class="asset" (click)="select(a.code)"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: a}"></ng-container><span><strong>{{a.code}}</strong><span class="asset-name">{{a.name}}{{a.kind === 'metal' ? ' · troy oz' : ''}}</span></span><span class="chevron">↗</span></button>} @empty {@if (!palestineMatch()) {<p>No matching assets in this category.</p>}}</div></section></div>}
   `
 })
 class App {
@@ -95,7 +101,16 @@ class App {
     const asset = this.asset(code);
     return asset.kind === 'metal' ? `troy oz of ${asset.name}` : code;
   }
+  palestineOpen = false;
+  palestineMatch() {
+    return this.kind === 'world' && ['palestine', 'palestinian territories', 'ps', 'pse'].includes(normalizeSearch(this.search));
+  }
   filtered() {
+    if (this.palestineMatch()) {
+      if (!this.palestineOpen) return [];
+      const currencies = countryCurrencies('ps');
+      return assets.filter(asset => currencies.has(asset.code));
+    }
     const query = normalizeSearch(this.search);
     const countries = this.kind === 'world' ? countryCurrencies(query) : new Set<string>();
     const rank = (code: string) => code.toLowerCase() === query ? 0 : countries.has(code) ? 1 : 2;
@@ -106,7 +121,7 @@ class App {
   }
   invalidate(){this.version++;this.result.set(null);this.error.set('');this.loading.set(false);}
   openPicker(side:'from'|'to'){this.picking.set(side);this.kind=this.asset(this[side]).kind;this.search='';setTimeout(()=>document.querySelector<HTMLInputElement>('.search')?.focus());}
-  closePicker(){this.picking.set('');}
+  closePicker(){this.palestineOpen=false;this.picking.set('');}
   select(code:string){const side=this.picking();if(side)this[side]=code;this.closePicker();this.invalidate();}
   swap(){[this.from,this.to]=[this.to,this.from];this.invalidate();}
   async calculate(){const version=++this.version;this.loading.set(true);this.error.set('');this.result.set(null);try{const response=await fetch('/api/convert?'+new URLSearchParams({amount:this.amount,from:this.from,to:this.to}),{signal:AbortSignal.timeout(25000)});const body=await response.json();if(!response.ok)throw new Error(body.error || 'Conversion unavailable');if(version===this.version)this.result.set(body);}catch(error){if(version===this.version)this.error.set(error instanceof Error?error.message:'Unable to connect. Please try again.');}finally{if(version===this.version)this.loading.set(false);}}
