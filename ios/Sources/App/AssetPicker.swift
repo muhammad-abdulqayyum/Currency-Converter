@@ -66,16 +66,20 @@ struct AssetPicker: View {
     }
     @State private var palestineOpen = false
     private var palestineMatch: Bool {
-        category == .world && ["palestine", "palestinian territories", "ps", "pse"].contains(CountrySearch.normalize(search))
+        let query = CountrySearch.normalize(search)
+        return category == .world && (palestineExactMatch(query) || (query.count >= 3 && "palestine".hasPrefix(query)))
+    }
+    private func palestineExactMatch(_ query: String) -> Bool {
+        ["palestine", "palestinian territories", "ps", "pse"].contains(query)
     }
     private var matches: [Asset] {
-        if palestineMatch {
-            guard palestineOpen else { return [] }
+        if palestineMatch && palestineOpen {
             let currencies = CountrySearch.currencies(for: "ps")
             return assets.filter { currencies.contains($0.code) }
         }
         let query = CountrySearch.normalize(search)
-        let countries = category == .world ? CountrySearch.currencies(for: query) : []
+        if palestineMatch && palestineExactMatch(query) { return [] }
+        let countries = category == .world ? CountrySearch.currencies(for: query, excluding: palestineMatch ? "PS" : nil) : []
         let results = assets.filter { asset in
             guard asset.category == category else { return false }
             return query.isEmpty

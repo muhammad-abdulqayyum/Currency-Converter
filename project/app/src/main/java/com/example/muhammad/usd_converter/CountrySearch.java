@@ -39,11 +39,12 @@ final class CountrySearch {
         return MARKS.matcher(decomposed).replaceAll("");
     }
 
-    Set<String> currencies(String query) {
+    Set<String> currencies(String query, String excludedCountry) {
         Set<String> matches = new HashSet<>();
         if (query.isEmpty()) return matches;
         for (Iterator<String> keys = countries.keys(); keys.hasNext();) {
             String code = keys.next();
+            if (code.equals(excludedCountry)) continue;
             JSONObject country = countries.optJSONObject(code);
             if (country == null) continue;
             boolean exact = code.equalsIgnoreCase(query) || country.optString("alpha3").equalsIgnoreCase(query);

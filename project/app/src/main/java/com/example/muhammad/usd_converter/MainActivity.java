@@ -151,15 +151,20 @@ public class MainActivity extends Activity {
         Runnable filter=()->{
             visible.clear();
             String query = CountrySearch.normalize(search.getText().toString());
-            boolean palestineMatch = category[0] == Asset.Kind.WORLD.ordinal()
-                    && Arrays.asList("palestine", "palestinian territories", "ps", "pse").contains(query);
+            boolean world = category[0] == Asset.Kind.WORLD.ordinal();
+            boolean palestineExactMatch = Arrays.asList("palestine", "palestinian territories", "ps", "pse").contains(query);
+            boolean palestineMatch = world && (palestineExactMatch
+                    || (query.length() >= 3 && "palestine".startsWith(query)));
             palestine.setVisibility(palestineMatch ? View.VISIBLE : View.GONE);
             palestine.setText(palestineOpen[0] ? "🇵🇸 Palestine · Hide currencies" : "🇵🇸 Palestine · Choose a currency");
-            Set<String> countries = category[0] == Asset.Kind.WORLD.ordinal()
-                    ? countrySearch.currencies(query) : Collections.emptySet();
+            boolean showPalestineCurrencies = palestineMatch && palestineOpen[0];
+            Set<String> countries = showPalestineCurrencies ? countrySearch.currencies("ps", null)
+                    : world ? countrySearch.currencies(query, palestineMatch ? "PS" : null) : Collections.emptySet();
             for (Asset asset : groups.get(category[0])) {
-                if (palestineMatch ? palestineOpen[0] && countries.contains(asset.code)
-                        : countries.contains(asset.code) || matchesAssetSearch(asset, query)) visible.add(asset);
+                if (countries.contains(asset.code) || (!showPalestineCurrencies
+                        && !(palestineMatch && palestineExactMatch) && matchesAssetSearch(asset, query))) {
+                    visible.add(asset);
+                }
             }
             Collections.sort(visible, (left, right) -> Integer.compare(
                     left.code.equalsIgnoreCase(query) ? 0 : countries.contains(left.code) ? 1 : 2,
