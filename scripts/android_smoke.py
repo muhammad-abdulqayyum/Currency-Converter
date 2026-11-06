@@ -73,6 +73,9 @@ for code,rate in {'GBP':'0.8','BRL':'5','PHP':'60','XAU':'0.00025','XAG':'0.025'
 prefs.append('</map>');(OUT/'fixture.xml').write_text(''.join(prefs));adb('push',str(OUT/'fixture.xml'),'/data/local/tmp/fixture.xml');adb('shell','run-as',PKG,'mkdir','-p','shared_prefs');adb('shell','run-as',PKG,'cp','/data/local/tmp/fixture.xml','shared_prefs/reference_rates.xml')
 try:
  launch();time.sleep(4);shot('home');assert b'VERSION 4' in ui();check_fit()
+ if os.environ.get('CANDIDATE_VERSION') == '4.0.6':
+  choose('to_asset','world_tab','Euro','Europe')
+  print('PASS: Europe search selects Euro',flush=True)
  top();tap('from_asset');tap('metals_tab');shot('metals-picker');tap('Gold',True)
  choose('to_asset','world_tab','United States Dollar','USD');check('400,000.00 USD')
  top();tap('swap');check('0.025 troy oz of Gold')
