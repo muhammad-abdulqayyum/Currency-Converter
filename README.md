@@ -1,22 +1,26 @@
-# Universal Currency Converter · Version 4.0.5
+# Universal Currency Converter
 
 By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
-**[Download Android 4.0.5](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/42170075311/artifacts/13480672717)** · Android 6.0+ · debug-signed preview. Sign in to GitHub, download the ZIP, and extract `app-debug.apk`. If the artifact has expired, see the [Android build workflow](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml) for newer builds.
+## Try it
 
-## Planned for 4.0.7
+| Platform | Get started |
+| --- | --- |
+| Web | **[Open Universal Currency Converter](https://universalconverter.app/)** in your browser. |
+| Android 6.0+ | **[Download the 4.0.6 preview](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/42278825498/artifacts/13533753638)**. Sign in to GitHub, download the ZIP, and open `app-debug.apk` on your phone. If the artifact has expired, use the latest successful [Android build](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml). |
+| iPhone and iPad | Follow the [iOS build instructions](ios/README.md) to try it in Xcode. |
 
-- Search for Palestine, Palestinian Territories, PS, or PSE in the World picker. Expand the Palestine entry to choose Israeli New Shekel (ILS), Jordanian Dinar (JOD), or United States Dollar (USD).
-- Search for England, Scotland, or Wales to find British Pound (GBP).
-- North Ireland and Northern Ireland match British Pound (GBP) as full phrases. Ireland on its own finds Euro (EUR).
+The Android preview is debug-signed.
 
-These changes are in development for Android, iOS, and web.
+1. Open either currency picker and select **World**.
+2. Type `Pale`. **🇵🇸 Palestine · Choose a currency** appears first, followed by **🇳🇵 Nepalese Rupee (NPR)**.
+3. Tap **Palestine** and choose Israeli New Shekel (ILS), Jordanian Dinar (JOD), or United States Dollar (USD).
 
-## Version 4.0.5 on Android, iOS, and web
+This search is live on the web and included in the Android preview and iOS source. See the [changelog](docs/version-4.0-history.md#country-search-update) for other search changes.
 
-Android and iOS can reuse a verified saved quote offline regardless of age. Both show the quote date and warn after seven days.
+## Version 4.0.5 history
 
-**4.0.5 is the latest version for Android, iOS, and web.** The [live web app](https://universalconverter.app/) runs 4.0.5 on Cloudflare, with the Black American Heritage Flag in the footer and metal results displayed in troy ounces of the named metal.
+Android and iOS can reuse a verified saved quote offline regardless of age. Both show the quote date and warn after seven days. The web app added the Black American Heritage Flag in the footer and displays metal results in troy ounces of the named metal.
 
 ## Version 4.0.4 history
 
