@@ -45,7 +45,7 @@ const searchAliases: Partial<Record<string, string>> = {
   <button type="button" class="swap" aria-label="Swap currencies" (click)="swap()">⇄</button>
   <button type="button" class="asset" (click)="openPicker('to')"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: asset(to)}"></ng-container><span><small>TO</small><strong>{{to}}</strong><span class="asset-name">{{asset(to).name}}</span></span><span class="chevron">⌄</span></button></div>
   <button class="convert" type="submit" [disabled]="loading()">{{loading() ? 'Getting reference rates…' : 'Convert now'}} <span>↗</span></button></form>
-  <div class="result" aria-live="polite">@if(error()){<p class="error" role="alert">{{error()}}</p>} @else if(result()){<small>{{result().amount}} {{result().from}} equals</small><div class="value">{{result().result}} <span>{{result().to}}</span></div>@for(q of result().quotes; track $index){<p class="quote">{{q.code}} · {{q.date}} · {{q.source}} {{q.cached ? '· cached' : ''}}</p>}} @else {<span class="result-placeholder">Your next perspective starts here.</span>}</div>
+  <div class="result" aria-live="polite">@if(error()){<p class="error" role="alert">{{error()}}</p>} @else if(result()){<small>{{result().amount}} {{resultUnit(result().from)}} equals</small><div class="value">{{result().result}} @if (asset(result().to).kind === 'metal') { {{resultUnit(result().to)}} } @else { <span>{{result().to}}</span> }</div>@for(q of result().quotes; track $index){<p class="quote">{{q.code}} · {{q.date}} · {{q.source}} {{q.cached ? '· cached' : ''}}</p>}} @else {<span class="result-placeholder">Your next perspective starts here.</span>}</div>
   <p class="note">Dated reference values, not live trading quotes. Metal units are troy ounces. Rates may have different effective dates; provider coverage varies.</p></section>
   <div class="features"><div><span>01</span><strong>Across borders</strong><p>World currencies in one searchable collection.</p></div><div><span>02</span><strong>Beyond currencies</strong><p>Gold, silver, platinum and palladium.</p></div><div><span>03</span><strong>Into digital</strong><p>Crypto and smaller denominations.</p></div></div>
   </main><footer>
@@ -77,6 +77,10 @@ class App {
     return 'icons/' + coin.toLowerCase() + '.png';
   }
   asset(code:string):Asset {return assets.find(a=>a.code===code)!;}
+  resultUnit(code: string): string {
+    const asset = this.asset(code);
+    return asset.kind === 'metal' ? `troy oz of ${asset.name}` : code;
+  }
   filtered() {
     const query = this.search.trim().toLowerCase();
     return assets.filter(asset => asset.kind === this.kind &&
