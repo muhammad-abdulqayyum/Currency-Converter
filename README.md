@@ -7,7 +7,7 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 | Platform | Get started |
 | --- | --- |
 | Web | **[Open Universal Currency Converter](https://universalconverter.app/)** in your browser. |
-| Android 6.0+ | **[Download the 4.0.6 preview](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/42278825498/artifacts/13533753638)**. Sign in to GitHub, download the ZIP, and open `app-debug.apk` on your phone. If the artifact has expired, use the latest successful [Android build](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml). |
+| Android 6.0+ | **[Download the 4.0.7 preview](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/42305560782/artifacts/13545099360)**. Sign in to GitHub, download and extract the ZIP, then open `app-debug.apk` on your phone. If the artifact has expired, use the latest successful [Android build](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml). |
 | iPhone and iPad | Follow the [iOS build instructions](ios/README.md) to try it in Xcode. |
 
 The Android preview is debug-signed.
