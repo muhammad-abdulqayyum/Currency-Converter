@@ -1,22 +1,22 @@
-# Universal Currency Converter · Version 4.0.5
+# Universal Currency Converter · Version 4.0.7
 
 By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
 **[Download Android 4.0.5](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/42170075311/artifacts/13480672717)** · Android 6.0+ · debug-signed preview. Sign in to GitHub, download the ZIP, and extract `app-debug.apk`. If the artifact has expired, see the [Android build workflow](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml) for newer builds.
 
-## Planned for 4.0.7
+## Version 4.0.7
 
 - Search for Palestine, Palestinian Territories, PS, or PSE in the World picker. Expand the Palestine entry to choose Israeli New Shekel (ILS), Jordanian Dinar (JOD), or United States Dollar (USD).
 - Search for England, Scotland, or Wales to find British Pound (GBP).
 - North Ireland and Northern Ireland match British Pound (GBP) as full phrases. Ireland on its own finds Euro (EUR).
 
-These changes are in development for Android, iOS, and web.
+These changes are included in the Android, iOS, and web source.
 
-## Version 4.0.5 on Android, iOS, and web
+## Version 4.0.5 history
 
 Android and iOS can reuse a verified saved quote offline regardless of age. Both show the quote date and warn after seven days.
 
-**4.0.5 is the latest version for Android, iOS, and web.** The [live web app](https://universalconverter.app/) runs 4.0.5 on Cloudflare, with the Black American Heritage Flag in the footer and metal results displayed in troy ounces of the named metal.
+Version 4.0.5 introduced web improvements, with the Black American Heritage Flag in the footer and metal results displayed in troy ounces of the named metal.
 
 ## Version 4.0.4 history
 
