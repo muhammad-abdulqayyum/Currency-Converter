@@ -47,6 +47,10 @@ final class CountrySearch {
             JSONObject country = countries.optJSONObject(code);
             if (country == null) continue;
             boolean exact = code.equalsIgnoreCase(query) || country.optString("alpha3").equalsIgnoreCase(query);
+            JSONArray exactAliases = country.optJSONArray("exactAliases");
+            for (int i = 0; !exact && exactAliases != null && i < exactAliases.length(); i++) {
+                exact = normalize(exactAliases.optString(i)).equals(query);
+            }
             boolean matched = exact || (query.length() >= 3 && normalize(country.optString("name")).contains(query));
             JSONArray aliases = country.optJSONArray("aliases");
             for (int i = 0; !matched && aliases != null && i < aliases.length(); i++) {

@@ -12,7 +12,12 @@ test('matches country names, complete ISO codes and accent variants', () => {
   for (const query of ['United States', 'US', 'USA', 'Puerto Rico', 'PRI']) {
     assert.deepEqual(search(query), ['USD'], query);
   }
+  for (const query of ['North Ireland', 'Northern Ireland']) assert.deepEqual(search(query), ['GBP']);
+  assert.deepEqual(search('Ireland'), ['EUR']);
   assert.deepEqual(search('PAN'), ['PAB', 'USD']);
+  for (const query of ['Palestine', 'Palestinian Territories', 'PS', 'PSE']) {
+    assert.deepEqual(search(query), ['ILS', 'JOD', 'USD'], query);
+  }
   assert.deepEqual(search(''), []);
 });
 

@@ -8,7 +8,8 @@ export function countryCurrencies(query: string): Set<string> {
   const matches = new Set<string>();
   if (!query) return matches;
   for (const [code, country] of Object.entries(countries)) {
-    if (code.toLowerCase() === query || country.alpha3.toLowerCase() === query) return new Set(country.currencies);
+    if (code.toLowerCase() === query || country.alpha3.toLowerCase() === query ||
+        ('exactAliases' in country && country.exactAliases.some(name => normalizeSearch(name) === query))) return new Set(country.currencies);
     if ([country.name, ...country.aliases].some(name => {
           const normalized = normalizeSearch(name);
           return normalized === query || (query.length >= 3 && normalized.includes(query));

@@ -64,7 +64,16 @@ struct AssetPicker: View {
         self.assets = assets; self.chosen = chosen; self.source = source; self.select = select
         _category = State(initialValue: chosen.category)
     }
+    @State private var palestineOpen = false
+    private var palestineMatch: Bool {
+        category == .world && ["palestine", "palestinian territories", "ps", "pse"].contains(CountrySearch.normalize(search))
+    }
     private var matches: [Asset] {
+        if palestineMatch {
+            guard palestineOpen else { return [] }
+            let currencies = CountrySearch.currencies(for: "ps")
+            return assets.filter { currencies.contains($0.code) }
+        }
         let query = CountrySearch.normalize(search)
         let countries = category == .world ? CountrySearch.currencies(for: query) : []
         let results = assets.filter { asset in
@@ -104,7 +113,12 @@ struct AssetPicker: View {
                             .accessibilityAddTraits(category == item ? [.isSelected] : [])
                     }
                 }.padding(.horizontal, 16)
-                if matches.isEmpty { Text("No matches in this category.").foregroundColor(Theme.muted).padding(); Spacer() }
+                if palestineMatch {
+                    Button { palestineOpen.toggle() } label: {
+                        Label("🇵🇸 Palestine · Choose a currency", systemImage: palestineOpen ? "chevron.up" : "chevron.down")
+                    }.padding(.vertical, 8)
+                }
+                if matches.isEmpty && !palestineMatch { Text("No matches in this category.").foregroundColor(Theme.muted).padding(); Spacer() }
                 else {
                     List(matches) { asset in
                         Button { select(asset); dismiss() } label: {
@@ -124,6 +138,8 @@ struct AssetPicker: View {
             }.padding(.top, 8).background(Theme.cream)
                 .navigationTitle(source ? "Convert from" : "Convert to").navigationBarTitleDisplayMode(.inline)
                 .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search name or code")
+                .onChange(of: search) { _ in palestineOpen = false }
+                .onChange(of: category) { _ in palestineOpen = false }
                 .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Done") { dismiss() }.foregroundColor(Theme.green) } }
         }.navigationViewStyle(.stack)
     }
