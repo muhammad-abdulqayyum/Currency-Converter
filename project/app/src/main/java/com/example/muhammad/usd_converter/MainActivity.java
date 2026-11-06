@@ -109,6 +109,12 @@ public class MainActivity extends Activity {
         if(from.isSubunit()||to.isSubunit())n+=(n.isEmpty()?"":"\n")+"Satoshi and drop outputs are rounded to whole units.";
         note.setText(n);note.setVisibility(n.isEmpty()?View.GONE:View.VISIBLE);amount.setError(null);clearResult();
     }
+    private boolean matchesAssetSearch(Asset asset, String query) {
+        String searchable = asset.name + " " + asset.code;
+        if ("USD".equals(asset.code)) searchable += " US Dollar";
+        return searchable.toLowerCase(Locale.ROOT).contains(query);
+    }
+
     private void hideKeyboard(){((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(amount.getWindowToken(),0);}
     private void openPicker(boolean source){
         if(loading)return;hideKeyboard();final Asset chosen=source?from:to;final int[] category={chosen.kind.ordinal()};
@@ -123,7 +129,7 @@ public class MainActivity extends Activity {
         ListView list=new ListView(this);list.setId(R.id.asset_list);list.setDividerHeight(dp(5));list.setPadding(0,dp(6),0,0);content.addView(list,new LinearLayout.LayoutParams(-1,0,1));
         List<Asset> visible=new ArrayList<>();BaseAdapter adapter=new BaseAdapter(){public int getCount(){return visible.size();}public Object getItem(int p){return visible.get(p);}public long getItemId(int p){return p;}public View getView(int p,View recycled,ViewGroup parent){Asset a=visible.get(p);return assetRow(a,a.code.equals(chosen.code),false);}};list.setAdapter(adapter);
         TextView empty=text("No matches in this category.",14,MUTED);add(content,empty,8);list.setEmptyView(empty);
-        Runnable filter=()->{visible.clear();String q=search.getText().toString().trim().toLowerCase(Locale.ROOT);for(Asset a:groups.get(category[0]))if((a.name+" "+a.code).toLowerCase(Locale.ROOT).contains(q))visible.add(a);adapter.notifyDataSetChanged();for(int i=0;i<3;i++){tabViews[i].setBackground(surface(i==category[0]?0xffdfe9ed:CREAM));tabViews[i].setSelected(i==category[0]);tabViews[i].setContentDescription(names[i]+(i==category[0]?", selected":""));}};
+        Runnable filter=()->{visible.clear();String q=search.getText().toString().trim().toLowerCase(Locale.ROOT);for(Asset a:groups.get(category[0]))if(matchesAssetSearch(a, q))visible.add(a);adapter.notifyDataSetChanged();for(int i=0;i<3;i++){tabViews[i].setBackground(surface(i==category[0]?0xffdfe9ed:CREAM));tabViews[i].setSelected(i==category[0]);tabViews[i].setContentDescription(names[i]+(i==category[0]?", selected":""));}};
         for(int i=0;i<3;i++){final int index=i;tabViews[i].setFocusable(true);tabViews[i].setOnClickListener(v->{category[0]=index;search.setText("");filter.run();if(pickerMotion!=null){pickerMotion.setSelected(index==0);if(index==0)pickerMotion.replay();}});}
         search.addTextChangedListener(watcher(filter));
         picker=new Dialog(this);picker.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -164,7 +170,7 @@ public class MainActivity extends Activity {
             }
         }
         if (world.isEmpty()) throw new IllegalArgumentException("Empty catalog");
-        world.add(new Asset("USD", "US Dollar", "🇺🇸", Asset.Kind.WORLD));
+        world.add(new Asset("USD", "United States Dollar", "🇺🇸", Asset.Kind.WORLD));
         java.util.Collections.sort(world, (a,b) -> a.name.compareToIgnoreCase(b.name));
         groups.add(world);
         List<Asset> metals = new ArrayList<>();

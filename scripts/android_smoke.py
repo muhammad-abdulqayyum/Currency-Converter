@@ -74,7 +74,7 @@ prefs.append('</map>');(OUT/'fixture.xml').write_text(''.join(prefs));adb('push'
 try:
  launch();time.sleep(4);shot('home');assert b'VERSION 4' in ui();check_fit()
  top();tap('from_asset');tap('metals_tab');shot('metals-picker');tap('Gold',True)
- choose('to_asset','world_tab','US Dollar','USD');check('400,000.00 USD')
+ choose('to_asset','world_tab','United States Dollar','USD');check('400,000.00 USD')
  top();tap('swap');check('0.025 troy oz of Gold')
  top();tap('from_asset');tap('crypto_tab');shot('crypto-picker');tap('Bitcoin',True);check('2,500 troy oz of Gold');assert b'Different reference dates' in ui();print('PASS: dates disclosed',flush=True)
  choose('to_asset','metals_tab','Silver');check('250,000 troy oz of Silver')
