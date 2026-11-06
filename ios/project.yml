@@ -15,7 +15,11 @@ targets:
   UniversalCurrencyConverter:
     type: application
     platform: iOS
-    sources: [Sources, Resources]
+    sources:
+      - Sources
+      - Resources
+      - path: ../shared/countries/country-currencies.json
+        buildPhase: resources
     info:
       path: Info.plist
       properties:
