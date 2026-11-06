@@ -4,10 +4,11 @@ export function normalizeSearch(value: string): string {
   return value.trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '');
 }
 
-export function countryCurrencies(query: string): Set<string> {
+export function countryCurrencies(query: string, excludedCountry?: string): Set<string> {
   const matches = new Set<string>();
   if (!query) return matches;
   for (const [code, country] of Object.entries(countries)) {
+    if (code === excludedCountry) continue;
     if (code.toLowerCase() === query || country.alpha3.toLowerCase() === query ||
         ('exactAliases' in country && country.exactAliases.some(name => normalizeSearch(name) === query))) return new Set(country.currencies);
     if ([country.name, ...country.aliases].some(name => {

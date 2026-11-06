@@ -103,16 +103,22 @@ class App {
   }
   palestineOpen = false;
   palestineMatch() {
-    return this.kind === 'world' && ['palestine', 'palestinian territories', 'ps', 'pse'].includes(normalizeSearch(this.search));
+    const query = normalizeSearch(this.search);
+    return this.kind === 'world' && (this.palestineExactMatch(query) ||
+      (query.length >= 3 && 'palestine'.startsWith(query)));
+  }
+  private palestineExactMatch(query: string) {
+    return ['palestine', 'palestinian territories', 'ps', 'pse'].includes(query);
   }
   filtered() {
-    if (this.palestineMatch()) {
-      if (!this.palestineOpen) return [];
+    const query = normalizeSearch(this.search);
+    const palestineMatch = this.palestineMatch();
+    if (palestineMatch && this.palestineOpen) {
       const currencies = countryCurrencies('ps');
       return assets.filter(asset => currencies.has(asset.code));
     }
-    const query = normalizeSearch(this.search);
-    const countries = this.kind === 'world' ? countryCurrencies(query) : new Set<string>();
+    if (palestineMatch && this.palestineExactMatch(query)) return [];
+    const countries = this.kind === 'world' ? countryCurrencies(query, palestineMatch ? 'PS' : undefined) : new Set<string>();
     const rank = (code: string) => code.toLowerCase() === query ? 0 : countries.has(code) ? 1 : 2;
     return assets.filter(asset => asset.kind === this.kind &&
       (countries.has(asset.code) || normalizeSearch(`${asset.code} ${asset.name}`).includes(query) ||
