@@ -5,6 +5,7 @@ enum CountrySearch {
         let alpha3: String
         let name: String
         let aliases: [String]
+        let exactAliases: [String]?
         let currencies: [String]
     }
 
@@ -24,7 +25,8 @@ enum CountrySearch {
 
     static func currencies(for query: String) -> Set<String> {
         guard !query.isEmpty else { return [] }
-        if let exact = dictionary.first(where: { $0.key.lowercased() == query || $0.value.alpha3.lowercased() == query }) {
+        if let exact = dictionary.first(where: { $0.key.lowercased() == query || $0.value.alpha3.lowercased() == query ||
+            ($0.value.exactAliases?.contains { normalize($0) == query } ?? false) }) {
             return Set(exact.value.currencies)
         }
         return Set(dictionary.values.flatMap { country -> [String] in
