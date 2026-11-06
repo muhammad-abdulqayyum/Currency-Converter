@@ -111,7 +111,7 @@ public class MainActivity extends Activity {
     }
     private boolean matchesAssetSearch(Asset asset, String query) {
         String searchable = asset.name + " " + asset.code;
-        if ("USD".equals(asset.code)) searchable += " United States Dollar";
+        if ("USD".equals(asset.code)) searchable += " US Dollar";
         return searchable.toLowerCase(Locale.ROOT).contains(query);
     }
 
@@ -170,7 +170,7 @@ public class MainActivity extends Activity {
             }
         }
         if (world.isEmpty()) throw new IllegalArgumentException("Empty catalog");
-        world.add(new Asset("USD", "US Dollar", "🇺🇸", Asset.Kind.WORLD));
+        world.add(new Asset("USD", "United States Dollar", "🇺🇸", Asset.Kind.WORLD));
         java.util.Collections.sort(world, (a,b) -> a.name.compareToIgnoreCase(b.name));
         groups.add(world);
         List<Asset> metals = new ArrayList<>();

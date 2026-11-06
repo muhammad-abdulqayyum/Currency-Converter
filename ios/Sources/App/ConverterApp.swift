@@ -18,7 +18,7 @@ enum Theme {
 
 @MainActor final class ConverterModel: ObservableObject {
     @Published var assets: [Asset] = []
-    @Published var from = Asset("USD", "US Dollar", "🇺🇸", .world)
+    @Published var from = Asset("USD", "United States Dollar", "🇺🇸", .world)
     @Published var to = Asset("GBP", "British Pound", "🇬🇧", .world)
     @Published var amount = "100"
     @Published var result = "Ready to convert"

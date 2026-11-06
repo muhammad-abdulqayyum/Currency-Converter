@@ -70,7 +70,7 @@ struct AssetPicker: View {
             guard asset.category == category else { return false }
             return query.isEmpty
                 || (asset.name + " " + asset.code).localizedCaseInsensitiveContains(query)
-                || (asset.code == "USD" && "United States Dollar".localizedCaseInsensitiveContains(query))
+                || (asset.code == "USD" && "US Dollar".localizedCaseInsensitiveContains(query))
         }
     }
     var body: some View {

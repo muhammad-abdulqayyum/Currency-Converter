@@ -29,7 +29,7 @@ public enum Catalog {
         }
         guard !world.isEmpty, !world.contains(where: { $0.code == "USD" }),
               Set(world.map(\.code)).count == world.count else { throw ConverterError.catalog }
-        world.append(Asset("USD", "US Dollar", "🇺🇸", .world))
+        world.append(Asset("USD", "United States Dollar", "🇺🇸", .world))
         world.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         return world + [Asset("XAU", "Gold", "Au", .metals), Asset("XAG", "Silver", "Ag", .metals),
                         Asset("XPT", "Platinum", "Pt", .metals), Asset("XPD", "Palladium", "Pd", .metals),
