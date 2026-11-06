@@ -1,14 +1,16 @@
-# Universal Currency Converter · Version 4.0.4 preview
+# Universal Currency Converter · Version 4.0.5
 
 By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
-**[Download Version 4.0.4 preview](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/develop/android-installer-file/Currency-Converter-4.0.4.apk)** · Android 6.0+ · debug-signed preview.
+**[Download the archived Android 4.0.4 preview](https://github.com/muhammad-abdulqayyum/Currency-Converter/raw/refs/heads/develop/android-installer-file/Currency-Converter-4.0.4.apk)** · Android 6.0+ · debug-signed preview. For 4.0.5 builds, see [Android build artifacts](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml).
 
-## Version 4.0.5 mobile changes
+## Version 4.0.5 on Android, iOS, and web
 
 Android and iOS can reuse a verified saved quote offline regardless of age. Both show the quote date and warn after seven days.
 
-## Version 4.0.4 preview
+The 4.0.5 web source displays metal conversions as troy ounces of the named metal. The live site reflects the latest successful Cloudflare deployment.
+
+## Version 4.0.4 history
 
 Dimensional Au/Ag/Pt/Pd bullion, BTC/ETH/XRP/LTC recognition icons and a green BCH coin are bundled identically on Android and iOS. BCH's white B tilts left; BTC tilts right. SAT and DROP keep their parent icons and denomination badges. Android's About screen now correctly reports 4.0.4.
 

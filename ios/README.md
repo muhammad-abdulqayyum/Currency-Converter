@@ -1,6 +1,6 @@
 # Universal Currency Converter for iPhone and iPad
 
-Native Swift/SwiftUI version 4.0.5 by Muhammad Hafiz Abdul-Qayyum, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
+Native Swift/SwiftUI version 4.0.5 (the current Android, iOS, and web source version) by Muhammad Hafiz Abdul-Qayyum, from Clinton Hill, Brooklyn, New York City, USA. Built for humanity, with care.
 
 Minimum deployment target: **iOS/iPadOS 15.0**. Universal iPhone/iPad interface; portrait and landscape; safe-area insets; Dynamic Type and VoiceOver labels; scrolls on small screens and with larger text. Uses only Apple frameworks, with no third-party runtime dependencies. Keep the Android APK for Android; it cannot install on iOS.
 
