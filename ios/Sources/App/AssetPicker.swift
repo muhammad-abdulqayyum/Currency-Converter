@@ -65,7 +65,13 @@ struct AssetPicker: View {
         _category = State(initialValue: chosen.category)
     }
     private var matches: [Asset] {
-        assets.filter { $0.category == category && (search.isEmpty || ($0.name + " " + $0.code).localizedCaseInsensitiveContains(search)) }
+        let query = search.trimmingCharacters(in: .whitespacesAndNewlines)
+        return assets.filter { asset in
+            guard asset.category == category else { return false }
+            return query.isEmpty
+                || (asset.name + " " + asset.code).localizedCaseInsensitiveContains(query)
+                || (asset.code == "USD" && "United States Dollar".localizedCaseInsensitiveContains(query))
+        }
     }
     var body: some View {
         NavigationView {
