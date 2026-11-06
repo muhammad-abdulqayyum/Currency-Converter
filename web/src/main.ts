@@ -73,7 +73,7 @@ const searchAliases: Partial<Record<string, string>> = {
   </footer>
   @if(picking()) {<div class="overlay" (click)="closePicker()"><section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" (click)="$event.stopPropagation()" (keydown.escape)="closePicker()"><div class="card-top"><h2 id="picker-title">Choose an asset</h2><button type="button" class="close" aria-label="Close asset picker" (click)="closePicker()">×</button></div><input class="search" aria-label="Search assets" placeholder="Search name or code…" [(ngModel)]="search" (ngModelChange)="palestineOpen = false"><div class="tabs">@for(k of kinds;track k){<button type="button" [class.active]="kind === k" (click)="kind=k; palestineOpen=false"><img class="category-icon" [src]="k === 'world' ? 'icons/category_world.png' : k === 'metal' ? 'icons/category_metals.png' : 'icons/category_crypto.png'" width="20" height="20" alt="">{{k === 'world' ? 'World' : k === 'metal' ? 'Metals' : 'Crypto'}}</button>}</div><div class="asset-list">@if (palestineMatch()) {
     <button type="button" class="asset" (click)="palestineOpen = !palestineOpen" [attr.aria-expanded]="palestineOpen">
-      <img class="world-flag" src="flags/ps.svg" alt="">
+      <span class="asset-icon" aria-hidden="true"><img class="world-flag" src="flags/ps.svg" alt=""></span>
       <span><strong>Palestine</strong><span class="asset-name">Choose a currency</span></span>
       <span class="chevron">{{palestineOpen ? '⌃' : '⌄'}}</span>
     </button>
