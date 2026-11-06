@@ -6,7 +6,7 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 
 ## Planned for 4.0.7
 
-- Search for Palestine, Palestinian Territories, PS, or PSE in the World picker. Expand the Palestine entry to choose Israeli New Shekel (ILS) or Jordanian Dinar (JOD).
+- Search for Palestine, Palestinian Territories, PS, or PSE in the World picker. Expand the Palestine entry to choose Israeli New Shekel (ILS), Jordanian Dinar (JOD), or United States Dollar (USD).
 - Search for England, Scotland, or Wales to find British Pound (GBP).
 - North Ireland and Northern Ireland match British Pound (GBP) as full phrases. Ireland on its own finds Euro (EUR).
 
