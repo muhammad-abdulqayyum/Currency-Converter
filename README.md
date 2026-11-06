@@ -4,6 +4,14 @@ By **Muhammad Hafiz Abdul-Qayyum**, from Clinton Hill, Brooklyn, New York City, 
 
 **[Download Android 4.0.5](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/runs/42170075311/artifacts/13480672717)** · Android 6.0+ · debug-signed preview. Sign in to GitHub, download the ZIP, and extract `app-debug.apk`. If the artifact has expired, see the [Android build workflow](https://github.com/muhammad-abdulqayyum/Currency-Converter/actions/workflows/android.yml) for newer builds.
 
+## Planned for 4.0.7
+
+- Search for Palestine, Palestinian Territories, PS, or PSE in the World picker. Expand the Palestine entry to choose Israeli New Shekel (ILS) or Jordanian Dinar (JOD).
+- Search for England, Scotland, or Wales to find British Pound (GBP).
+- North Ireland and Northern Ireland match British Pound (GBP) as full phrases. Ireland on its own finds Euro (EUR).
+
+These changes are in development for Android, iOS, and web.
+
 ## Version 4.0.5 on Android, iOS, and web
 
 Android and iOS can reuse a verified saved quote offline regardless of age. Both show the quote date and warn after seven days.
