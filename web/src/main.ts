@@ -10,12 +10,14 @@ const searchAliases: Partial<Record<string, string>> = {
 @Component({
   selector: 'app-root', standalone: true, imports: [FormsModule, NgTemplateOutlet],
   styles: [`
-    .footer-credit { text-align: right; line-height: 1.6; }
+    .footer-credit { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 4px 12px; line-height: 1.6; }
+    .footer-author { display: inline-flex; align-items: center; gap: 6px; }
+    .footer-credit .heritage-flag { flex: none; object-fit: contain; }
     .footer-credit a { color: #244e43; white-space: nowrap; }
     @media (max-width: 600px) {
       footer { justify-content: center; }
       .footer-brand { display: none; }
-      .footer-credit { text-align: center; }
+      .footer-credit { justify-content: center; text-align: center; }
     }
   `],
   template: `
@@ -48,9 +50,11 @@ const searchAliases: Partial<Record<string, string>> = {
   <div class="features"><div><span>01</span><strong>Across borders</strong><p>World currencies in one searchable collection.</p></div><div><span>02</span><strong>Beyond currencies</strong><p>Gold, silver, platinum and palladium.</p></div><div><span>03</span><strong>Into digital</strong><p>Crypto and smaller denominations.</p></div></div>
   </main><footer>
     <div class="footer-brand">Universal Currency Converter</div>
-    <div class="footer-credit">Built by Muhammad Hafiz Abdul-Qayyum ·
+    <div class="footer-credit"><div class="footer-author"><div>Built by Muhammad Hafiz Abdul-Qayyum</div>
+      <img class="heritage-flag" src="icons/heritage_flag.png" width="28" height="19" alt="Black American Heritage Flag"></div>
+      <div>
       <a href="https://www.linkedin.com/in/mabdulqayyum">LinkedIn</a> ·
-      <a href="https://github.com/muhammad-abdulqayyum/Currency-Converter">Source code</a>
+      <a href="https://github.com/muhammad-abdulqayyum/Currency-Converter">Source code</a></div>
     </div>
   </footer>
   @if(picking()) {<div class="overlay" (click)="closePicker()"><section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" (click)="$event.stopPropagation()" (keydown.escape)="closePicker()"><div class="card-top"><h2 id="picker-title">Choose an asset</h2><button type="button" class="close" aria-label="Close asset picker" (click)="closePicker()">×</button></div><input class="search" aria-label="Search assets" placeholder="Search name or code…" [(ngModel)]="search"><div class="tabs">@for(k of kinds;track k){<button type="button" [class.active]="kind === k" (click)="kind=k"><img class="category-icon" [src]="k === 'world' ? 'icons/category_world.png' : k === 'metal' ? 'icons/category_metals.png' : 'icons/category_crypto.png'" width="20" height="20" alt="">{{k === 'world' ? 'World' : k === 'metal' ? 'Metals' : 'Crypto'}}</button>}</div><div class="asset-list">@for(a of filtered();track a.code){<button type="button" class="asset" (click)="select(a.code)"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: a}"></ng-container><span><strong>{{a.code}}</strong><span class="asset-name">{{a.name}}{{a.kind === 'metal' ? ' · troy oz' : ''}}</span></span><span class="chevron">↗</span></button>} @empty {<p>No matching assets in this category.</p>}</div></section></div>}
