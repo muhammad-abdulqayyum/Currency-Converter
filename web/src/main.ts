@@ -4,6 +4,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { countryCurrencies, normalizeSearch } from './country-search';
 import { assets, Asset } from '../../shared/assets';
+const palestineCurrencyCodes = countryCurrencies('ps');
 const searchAliases: Partial<Record<string, string>> = {
   USD: 'US Dollar',
   EUR: 'Europe',
@@ -49,6 +50,9 @@ const searchAliases: Partial<Record<string, string>> = {
       }
     </span>
   </ng-template>
+  <ng-template #assetOption let-a>
+    <button type="button" class="asset" (click)="select(a.code)"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: a}"></ng-container><span><strong>{{a.code}}</strong><span class="asset-name">{{a.name}}{{a.kind === 'metal' ? ' · troy oz' : ''}}</span></span><span class="chevron">↗</span></button>
+  </ng-template>
   <header><a href="/" class="brand"><span class="logo">◎</span><span>UNIVERSAL<small>CURRENCY CONVERTER</small></span></a><span class="web-label">WORLD · METALS · CRYPTO</span></header>
   <main><div class="intro"><span class="eyebrow">A WORLD OF VALUE, CONNECTED</span><h1>Different currencies.<br><em>One clear conversion.</em></h1><p>Explore world currencies, precious metals and cryptocurrency in one place.</p></div>
   <section class="converter" aria-label="Currency converter"><div class="card-top"><h2>Make the connection</h2><span class="badge">REFERENCE RATES</span></div>
@@ -77,7 +81,12 @@ const searchAliases: Partial<Record<string, string>> = {
       <span><strong>Palestine</strong><span class="asset-name">Choose a currency</span></span>
       <span class="chevron">{{palestineOpen ? '⌃' : '⌄'}}</span>
     </button>
-  } @for(a of filtered();track a.code){<button type="button" class="asset" (click)="select(a.code)"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: a}"></ng-container><span><strong>{{a.code}}</strong><span class="asset-name">{{a.name}}{{a.kind === 'metal' ? ' · troy oz' : ''}}</span></span><span class="chevron">↗</span></button>} @empty {@if (!palestineMatch()) {<p>No matching assets in this category.</p>}}</div></section></div>}
+    @if (palestineOpen) {
+      @for (a of palestineCurrencies; track a.code) {
+        <ng-container [ngTemplateOutlet]="assetOption" [ngTemplateOutletContext]="{$implicit: a}"></ng-container>
+      }
+    }
+  } @for(a of filtered();track a.code){<ng-container [ngTemplateOutlet]="assetOption" [ngTemplateOutletContext]="{$implicit: a}"></ng-container>} @empty {@if (!palestineMatch()) {<p>No matching assets in this category.</p>}}</div></section></div>}
   `
 })
 class App {
@@ -102,9 +111,10 @@ class App {
     return asset.kind === 'metal' ? `troy oz of ${asset.name}` : code;
   }
   palestineOpen = false;
+  readonly palestineCurrencies = assets.filter(asset => palestineCurrencyCodes.has(asset.code));
   palestineMatch() {
     const query = normalizeSearch(this.search);
-    return this.kind === 'world' && (this.palestineExactMatch(query) ||
+    return this.kind === 'world' && (!query || this.palestineExactMatch(query) ||
       (query.length >= 3 && 'palestine'.startsWith(query)));
   }
   private palestineExactMatch(query: string) {
@@ -113,11 +123,7 @@ class App {
   filtered() {
     const query = normalizeSearch(this.search);
     const palestineMatch = this.palestineMatch();
-    if (palestineMatch && this.palestineOpen) {
-      const currencies = countryCurrencies('ps');
-      return assets.filter(asset => currencies.has(asset.code));
-    }
-    if (palestineMatch && this.palestineExactMatch(query)) return [];
+    if (palestineMatch && query && (this.palestineOpen || this.palestineExactMatch(query))) return [];
     const countries = this.kind === 'world' ? countryCurrencies(query, palestineMatch ? 'PS' : undefined) : new Set<string>();
     const rank = (code: string) => code.toLowerCase() === query ? 0 : countries.has(code) ? 1 : 2;
     return assets.filter(asset => asset.kind === this.kind &&
