@@ -95,10 +95,13 @@ public class MainActivity extends Activity {
     private String units(Asset a){return a.kind==Asset.Kind.METAL?"troy oz of "+a.name:a.code;}
     private String subtitle(Asset a){if(a.isSubunit())return a.code+" · "+a.rateCode()+" subunit";return a.code+(a.kind==Asset.Kind.METAL?" · troy oz":a.kind==Asset.Kind.CRYPTO?" · coin units":"");}
     private View assetRow(Asset a,boolean selected,boolean chevron){
+        return assetRow(a, selected, chevron, subtitle(a), chevron ? "⌄" : selected ? "✓" : "");
+    }
+    private View assetRow(Asset a, boolean selected, boolean chevron, String subtitle, String indicator) {
         LinearLayout row=new LinearLayout(this);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(10),dp(chevron?8:10),dp(12),dp(chevron?8:10));row.setMinimumHeight(dp(chevron?64:76));row.setBackground(surface(selected?0xffeaf0e3:0xfffffdfa));
         AssetIconView icon=new AssetIconView(this,a);icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);row.addView(icon,new LinearLayout.LayoutParams(dp(chevron?44:52),dp(chevron?44:52)));
-        LinearLayout labels=column();labels.setPadding(dp(12),0,dp(6),0);row.addView(labels,new LinearLayout.LayoutParams(0,-2,1));add(labels,heading(a.name,chevron?18:20),0);add(labels,text(subtitle(a),12,MUTED),3);
-        row.addView(text(chevron?"⌄":selected?"✓":"",22,GREEN),new LinearLayout.LayoutParams(dp(24),-2));row.setContentDescription(a.name+", "+subtitle(a)+(selected?", selected":""));return row;
+        LinearLayout labels=column();labels.setPadding(dp(12),0,dp(6),0);row.addView(labels,new LinearLayout.LayoutParams(0,-2,1));add(labels,heading(a.name,chevron?18:20),0);add(labels,text(subtitle,12,MUTED),3);
+        row.addView(text(indicator,22,GREEN),new LinearLayout.LayoutParams(dp(24),-2));row.setContentDescription(a.name+", "+subtitle+(selected?", selected":""));return row;
     }
     private void updatePair(){
         fromButton.removeAllViews();fromButton.addView(assetRow(from,false,true));fromButton.setFocusable(true);fromButton.setContentDescription("From: "+from.name+". Choose source asset");
@@ -109,6 +112,7 @@ public class MainActivity extends Activity {
         if(from.isSubunit()||to.isSubunit())n+=(n.isEmpty()?"":"\n")+"Satoshi and drop outputs are rounded to whole units.";
         note.setText(n);note.setVisibility(n.isEmpty()?View.GONE:View.VISIBLE);amount.setError(null);clearResult();
     }
+    private static final Asset PALESTINE_OPTION = new Asset("PS", "Palestine", "🇵🇸", Asset.Kind.WORLD);
     private CountrySearch countrySearch;
 
     private boolean matchesAssetSearch(Asset asset, String query) {
@@ -137,15 +141,24 @@ public class MainActivity extends Activity {
             TextView label=text(names[i],13,NAVY);label.setGravity(Gravity.CENTER);tab.addView(label);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(dp(2),0,dp(2),0);tabs.addView(tab,lp);tabViews[i]=tab;
         }
         EditText search=new EditText(this);search.setId(R.id.asset_search);search.setHint("Search name or code");search.setContentDescription("Search assets in selected category");search.setTextSize(15);search.setSingleLine(true);search.setMinHeight(dp(48));search.setInputType(1);add(content,search,10);
-        Button palestine = new Button(this);
-        palestine.setAllCaps(false);
-        palestine.setTextColor(NAVY);
-        palestine.setBackground(surface(0xfffffdfa));
-        palestine.setText("🇵🇸 Palestine · Choose a currency");
-        add(content, palestine, 6);
         boolean[] palestineOpen = {false};
         ListView list=new ListView(this);list.setId(R.id.asset_list);list.setDividerHeight(dp(5));list.setPadding(0,dp(6),0,0);content.addView(list,new LinearLayout.LayoutParams(-1,0,1));
-        List<Asset> visible=new ArrayList<>();BaseAdapter adapter=new BaseAdapter(){public int getCount(){return visible.size();}public Object getItem(int p){return visible.get(p);}public long getItemId(int p){return p;}public View getView(int p,View recycled,ViewGroup parent){Asset a=visible.get(p);return assetRow(a,a.code.equals(chosen.code),false);}};list.setAdapter(adapter);
+        List<Asset> visible = new ArrayList<>();
+        BaseAdapter adapter = new BaseAdapter() {
+            public int getCount() { return visible.size(); }
+            public Asset getItem(int position) { return visible.get(position); }
+            public long getItemId(int position) { return position; }
+            public View getView(int position, View recycled, ViewGroup parent) {
+                Asset asset = getItem(position);
+                if (asset == PALESTINE_OPTION) {
+                    return assetRow(asset, false, false,
+                            palestineOpen[0] ? "Hide currencies" : "Choose a currency",
+                            palestineOpen[0] ? "⌃" : "⌄");
+                }
+                return assetRow(asset, asset.code.equals(chosen.code), false);
+            }
+        };
+        list.setAdapter(adapter);
         TextView empty=text("No matches in this category.",14,MUTED);add(content,empty,8);list.setEmptyView(empty);
         if (countrySearch == null) countrySearch = new CountrySearch(getAssets());
         Runnable filter=()->{
@@ -155,36 +168,53 @@ public class MainActivity extends Activity {
             boolean palestineExactMatch = Arrays.asList("palestine", "palestinian territories", "ps", "pse").contains(query);
             boolean palestineMatch = world && (palestineExactMatch
                     || (query.length() >= 3 && "palestine".startsWith(query)));
-            palestine.setVisibility(palestineMatch ? View.VISIBLE : View.GONE);
-            palestine.setText(palestineOpen[0] ? "🇵🇸 Palestine · Hide currencies" : "🇵🇸 Palestine · Choose a currency");
-            boolean showPalestineCurrencies = palestineMatch && palestineOpen[0];
-            Set<String> countries = showPalestineCurrencies ? countrySearch.currencies("ps", null)
-                    : world ? countrySearch.currencies(query, palestineMatch ? "PS" : null) : Collections.emptySet();
-            for (Asset asset : groups.get(category[0])) {
-                if (countries.contains(asset.code) || (!showPalestineCurrencies
-                        && !(palestineMatch && palestineExactMatch) && matchesAssetSearch(asset, query))) {
-                    visible.add(asset);
+            Set<String> countries = world ? countrySearch.currencies(query, palestineMatch ? "PS" : null)
+                    : Collections.emptySet();
+            if (!(palestineMatch && (palestineExactMatch || palestineOpen[0]))) {
+                for (Asset asset : groups.get(category[0])) {
+                    if (countries.contains(asset.code) || matchesAssetSearch(asset, query)) visible.add(asset);
+                }
+                Collections.sort(visible, (left, right) -> Integer.compare(
+                        left.code.equalsIgnoreCase(query) ? 0 : countries.contains(left.code) ? 1 : 2,
+                        right.code.equalsIgnoreCase(query) ? 0 : countries.contains(right.code) ? 1 : 2));
+            }
+            if (world && (query.isEmpty() || palestineMatch)) {
+                int position = 0;
+                if (query.isEmpty()) {
+                    while (position < visible.size()
+                            && visible.get(position).name.compareToIgnoreCase(PALESTINE_OPTION.name) < 0) position++;
+                }
+                visible.add(position, PALESTINE_OPTION);
+                if (palestineOpen[0]) {
+                    Set<String> options = countrySearch.currencies("ps", null);
+                    for (String code : Arrays.asList("USD", "ILS", "JOD")) {
+                        if (options.contains(code)) visible.add(++position, find(code));
+                    }
                 }
             }
-            Collections.sort(visible, (left, right) -> Integer.compare(
-                    left.code.equalsIgnoreCase(query) ? 0 : countries.contains(left.code) ? 1 : 2,
-                    right.code.equalsIgnoreCase(query) ? 0 : countries.contains(right.code) ? 1 : 2));
-            empty.setText(palestineMatch && !palestineOpen[0] ? "" : "No matches in this category.");
             adapter.notifyDataSetChanged();for(int i=0;i<3;i++){tabViews[i].setBackground(surface(i==category[0]?0xffdfe9ed:CREAM));tabViews[i].setSelected(i==category[0]);tabViews[i].setContentDescription(names[i]+(i==category[0]?", selected":""));}};
         for(int i=0;i<3;i++){final int index=i;tabViews[i].setFocusable(true);tabViews[i].setOnClickListener(v->{category[0]=index;search.setText("");filter.run();if(pickerMotion!=null){pickerMotion.setSelected(index==0);if(index==0)pickerMotion.replay();}});}
-        palestine.setOnClickListener(v -> {
-            palestineOpen[0] = !palestineOpen[0];
-            if (palestineOpen[0]) ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
-                    .hideSoftInputFromWindow(search.getWindowToken(), 0);
-            filter.run();
-        });
         search.addTextChangedListener(watcher(() -> {
             palestineOpen[0] = false;
             filter.run();
         }));
         picker=new Dialog(this);picker.requestWindowFeature(Window.FEATURE_NO_TITLE);
         Button cancel=new Button(this,null,android.R.attr.borderlessButtonStyle);cancel.setText("Cancel");cancel.setAllCaps(false);cancel.setTextColor(GREEN);cancel.setMinHeight(dp(48));add(content,cancel,4);picker.setContentView(content);cancel.setOnClickListener(v->picker.dismiss());picker.getWindow().setBackgroundDrawable(surface(CREAM));
-        list.setOnItemClickListener((parent,v,position,id)->{if(source)from=visible.get(position);else to=visible.get(position);updatePair();picker.dismiss();});
+        list.setOnItemClickListener((parent, view, position, id) -> {
+            Asset asset = visible.get(position);
+            if (asset == PALESTINE_OPTION) {
+                int top = view.getTop() - list.getPaddingTop();
+                palestineOpen[0] = !palestineOpen[0];
+                if (palestineOpen[0]) ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+                        .hideSoftInputFromWindow(search.getWindowToken(), 0);
+                filter.run();
+                list.setSelectionFromTop(position, top);
+                return;
+            }
+            if (source) from = asset; else to = asset;
+            updatePair();
+            picker.dismiss();
+        });
         picker.setOnDismissListener(d->{if(pickerMotion!=null){pickerMotion.destroy();pickerMotion=null;}picker=null;});picker.show();picker.getWindow().setLayout(Math.min(getResources().getDisplayMetrics().widthPixels-dp(24),dp(520)),(int)(getResources().getDisplayMetrics().heightPixels*.86));picker.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN|WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         content.setFocusableInTouchMode(true);content.requestFocus();filter.run();pickerMotion=new GlobeMotion(worldIcon);pickerMotion.setSelected(category[0]==0);pickerMotion.setActive(true);final GlobeMotion motion=pickerMotion;worldIcon.post(motion::refreshVisibility);
     }
