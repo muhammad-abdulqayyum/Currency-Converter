@@ -113,6 +113,7 @@ public class MainActivity extends Activity {
         note.setText(n);note.setVisibility(n.isEmpty()?View.GONE:View.VISIBLE);amount.setError(null);clearResult();
     }
     private static final Asset PALESTINE_OPTION = new Asset("PS", "Palestine", "🇵🇸", Asset.Kind.WORLD);
+    private static final Asset PALAU_OPTION = new Asset("PW", "Palau", "🇵🇼", Asset.Kind.WORLD);
     private CountrySearch countrySearch;
 
     private boolean matchesAssetSearch(Asset asset, String query) {
@@ -141,7 +142,7 @@ public class MainActivity extends Activity {
             TextView label=text(names[i],13,NAVY);label.setGravity(Gravity.CENTER);tab.addView(label);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(dp(2),0,dp(2),0);tabs.addView(tab,lp);tabViews[i]=tab;
         }
         EditText search=new EditText(this);search.setId(R.id.asset_search);search.setHint("Search name or code");search.setContentDescription("Search assets in selected category");search.setTextSize(15);search.setSingleLine(true);search.setMinHeight(dp(48));search.setInputType(1);add(content,search,10);
-        boolean[] palestineOpen = {false};
+        boolean[] countryOpen = {false};
         ListView list=new ListView(this);list.setId(R.id.asset_list);list.setDividerHeight(dp(5));list.setPadding(0,dp(6),0,0);content.addView(list,new LinearLayout.LayoutParams(-1,0,1));
         List<Asset> visible = new ArrayList<>();
         BaseAdapter adapter = new BaseAdapter() {
@@ -150,16 +151,12 @@ public class MainActivity extends Activity {
             public long getItemId(int position) { return position; }
             public View getView(int position, View recycled, ViewGroup parent) {
                 Asset asset = getItem(position);
-                if (asset == PALESTINE_OPTION) {
+                if (asset == PALESTINE_OPTION || asset == PALAU_OPTION) {
                     return assetRow(asset, false, false,
-                            palestineOpen[0] ? "Hide currencies" : "Choose a currency",
-                            palestineOpen[0] ? "⌃" : "⌄");
+                            countryOpen[0] ? "Hide currencies" : "Choose a currency",
+                            countryOpen[0] ? "⌃" : "⌄");
                 }
-                String query = CountrySearch.normalize(search.getText().toString());
-                boolean palauSearch = "palau".equals(query) || "pw".equals(query) || "plw".equals(query);
-                Asset displayAsset = palauSearch && "USD".equals(asset.code)
-                        ? new Asset(asset.code, asset.name, "🇵🇼", asset.kind) : asset;
-                return assetRow(displayAsset, asset.code.equals(chosen.code), false);
+                return assetRow(asset, asset.code.equals(chosen.code), false);
             }
         };
         list.setAdapter(adapter);
@@ -172,9 +169,12 @@ public class MainActivity extends Activity {
             boolean palestineExactMatch = Arrays.asList("palestine", "palestinian territories", "ps", "pse").contains(query);
             boolean palestineMatch = world && (query.isEmpty() || palestineExactMatch
                     || (query.length() >= 3 && "palestine".startsWith(query)));
+            boolean palauMatch = world && ("pala".equals(query) || "palau".equals(query)
+                    || "pw".equals(query) || "plw".equals(query));
+            Asset countryOption = palauMatch ? PALAU_OPTION : palestineMatch ? PALESTINE_OPTION : null;
             Set<String> countries = world ? countrySearch.currencies(query, palestineMatch ? "PS" : null)
                     : Collections.emptySet();
-            if (!(palestineMatch && (palestineExactMatch || palestineOpen[0]))) {
+            if (!palauMatch && !(palestineMatch && (palestineExactMatch || countryOpen[0]))) {
                 for (Asset asset : groups.get(category[0])) {
                     if (countries.contains(asset.code) || matchesAssetSearch(asset, query)) visible.add(asset);
                 }
@@ -182,15 +182,15 @@ public class MainActivity extends Activity {
                         left.code.equalsIgnoreCase(query) ? 0 : countries.contains(left.code) ? 1 : 2,
                         right.code.equalsIgnoreCase(query) ? 0 : countries.contains(right.code) ? 1 : 2));
             }
-            if (palestineMatch) {
+            if (countryOption != null) {
                 int position = 0;
                 if (query.isEmpty()) {
                     while (position < visible.size()
-                            && visible.get(position).name.compareToIgnoreCase(PALESTINE_OPTION.name) < 0) position++;
+                            && visible.get(position).name.compareToIgnoreCase(countryOption.name) < 0) position++;
                 }
-                visible.add(position, PALESTINE_OPTION);
-                if (palestineOpen[0]) {
-                    Set<String> options = countrySearch.currencies("ps", null);
+                visible.add(position, countryOption);
+                if (countryOpen[0]) {
+                    Set<String> options = countrySearch.currencies(countryOption.code.toLowerCase(Locale.ROOT), null);
                     for (String code : Arrays.asList("USD", "ILS", "JOD")) {
                         if (options.contains(code)) visible.add(++position, find(code));
                     }
@@ -199,20 +199,20 @@ public class MainActivity extends Activity {
             adapter.notifyDataSetChanged();for(int i=0;i<3;i++){tabViews[i].setBackground(surface(i==category[0]?0xffdfe9ed:CREAM));tabViews[i].setSelected(i==category[0]);tabViews[i].setContentDescription(names[i]+(i==category[0]?", selected":""));}};
         for(int i=0;i<3;i++){final int index=i;tabViews[i].setFocusable(true);tabViews[i].setOnClickListener(v->{category[0]=index;search.setText("");filter.run();if(pickerMotion!=null){pickerMotion.setSelected(index==0);if(index==0)pickerMotion.replay();}});}
         search.addTextChangedListener(watcher(() -> {
-            palestineOpen[0] = false;
+            countryOpen[0] = false;
             filter.run();
         }));
         picker=new Dialog(this);picker.requestWindowFeature(Window.FEATURE_NO_TITLE);
         Button cancel=new Button(this,null,android.R.attr.borderlessButtonStyle);cancel.setText("Cancel");cancel.setAllCaps(false);cancel.setTextColor(GREEN);cancel.setMinHeight(dp(48));add(content,cancel,4);picker.setContentView(content);cancel.setOnClickListener(v->picker.dismiss());picker.getWindow().setBackgroundDrawable(surface(CREAM));
         list.setOnItemClickListener((parent, view, position, id) -> {
             Asset asset = visible.get(position);
-            if (asset == PALESTINE_OPTION) {
+            if (asset == PALESTINE_OPTION || asset == PALAU_OPTION) {
                 int top = view.getTop() - list.getPaddingTop();
-                palestineOpen[0] = !palestineOpen[0];
-                if (palestineOpen[0]) ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+                countryOpen[0] = !countryOpen[0];
+                if (countryOpen[0]) ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
                         .hideSoftInputFromWindow(search.getWindowToken(), 0);
                 filter.run();
-                list.setSelectionFromTop(visible.indexOf(PALESTINE_OPTION), palestineOpen[0] ? 0 : top);
+                list.setSelectionFromTop(visible.indexOf(asset), countryOpen[0] ? 0 : top);
                 return;
             }
             if (source) from = asset; else to = asset;
