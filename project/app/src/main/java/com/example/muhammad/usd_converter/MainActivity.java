@@ -155,7 +155,11 @@ public class MainActivity extends Activity {
                             palestineOpen[0] ? "Hide currencies" : "Choose a currency",
                             palestineOpen[0] ? "⌃" : "⌄");
                 }
-                return assetRow(asset, asset.code.equals(chosen.code), false);
+                String query = CountrySearch.normalize(search.getText().toString());
+                boolean palauSearch = "palau".equals(query) || "pw".equals(query) || "plw".equals(query);
+                Asset displayAsset = palauSearch && "USD".equals(asset.code)
+                        ? new Asset(asset.code, asset.name, "🇵🇼", asset.kind) : asset;
+                return assetRow(displayAsset, asset.code.equals(chosen.code), false);
             }
         };
         list.setAdapter(adapter);
