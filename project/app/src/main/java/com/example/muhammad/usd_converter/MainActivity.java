@@ -166,7 +166,7 @@ public class MainActivity extends Activity {
             String query = CountrySearch.normalize(search.getText().toString());
             boolean world = category[0] == Asset.Kind.WORLD.ordinal();
             boolean palestineExactMatch = Arrays.asList("palestine", "palestinian territories", "ps", "pse").contains(query);
-            boolean palestineMatch = world && (palestineExactMatch
+            boolean palestineMatch = world && (query.isEmpty() || palestineExactMatch
                     || (query.length() >= 3 && "palestine".startsWith(query)));
             Set<String> countries = world ? countrySearch.currencies(query, palestineMatch ? "PS" : null)
                     : Collections.emptySet();
@@ -178,7 +178,7 @@ public class MainActivity extends Activity {
                         left.code.equalsIgnoreCase(query) ? 0 : countries.contains(left.code) ? 1 : 2,
                         right.code.equalsIgnoreCase(query) ? 0 : countries.contains(right.code) ? 1 : 2));
             }
-            if (world && (query.isEmpty() || palestineMatch)) {
+            if (palestineMatch) {
                 int position = 0;
                 if (query.isEmpty()) {
                     while (position < visible.size()
@@ -208,7 +208,7 @@ public class MainActivity extends Activity {
                 if (palestineOpen[0]) ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
                         .hideSoftInputFromWindow(search.getWindowToken(), 0);
                 filter.run();
-                list.setSelectionFromTop(position, top);
+                list.setSelectionFromTop(visible.indexOf(PALESTINE_OPTION), palestineOpen[0] ? 0 : top);
                 return;
             }
             if (source) from = asset; else to = asset;
