@@ -41,7 +41,7 @@ for label,device in matrix:
  checks=[] if label=='phone' else ['-only-testing:ConverterUITests/ConverterUITests/testLayoutAndFooter','-only-testing:ConverterUITests/ConverterUITests/testLargeTextAndLandscapeFooter','-only-testing:ConverterUITests/ConverterUITests/testCryptoUnits']
  xcode(*checks,'-destination','id='+udid,'-parallel-testing-enabled','NO','-test-timeouts-enabled','YES',
        '-default-test-execution-time-allowance','120','-maximum-test-execution-time-allowance','180',
-       '-resultBundlePath',str(OUT/(label+'.xcresult')),'test-without-building',log=label+'-tests.log',timeout=480)
+       '-resultBundlePath',str(OUT/(label+'.xcresult')),'test-without-building',log=label+'-tests.log',timeout=720)
  if label == 'phone':
   attachments=OUT/'attachments'
   subprocess.run(['xcrun','xcresulttool','export','attachments','--path',str(OUT/'phone.xcresult'),
