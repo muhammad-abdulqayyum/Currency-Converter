@@ -142,7 +142,7 @@ public class MainActivity extends Activity {
             TextView label=text(names[i],13,NAVY);label.setGravity(Gravity.CENTER);tab.addView(label);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(dp(2),0,dp(2),0);tabs.addView(tab,lp);tabViews[i]=tab;
         }
         EditText search=new EditText(this);search.setId(R.id.asset_search);search.setHint("Search name or code");search.setContentDescription("Search assets in selected category");search.setTextSize(15);search.setSingleLine(true);search.setMinHeight(dp(48));search.setInputType(1);add(content,search,10);
-        boolean[] countryOpen = {false};
+        Asset[] openCountry = {null};
         ListView list=new ListView(this);list.setId(R.id.asset_list);list.setDividerHeight(dp(5));list.setPadding(0,dp(6),0,0);content.addView(list,new LinearLayout.LayoutParams(-1,0,1));
         List<Asset> visible = new ArrayList<>();
         BaseAdapter adapter = new BaseAdapter() {
@@ -153,8 +153,8 @@ public class MainActivity extends Activity {
                 Asset asset = getItem(position);
                 if (asset == PALESTINE_OPTION || asset == PALAU_OPTION) {
                     return assetRow(asset, false, false,
-                            countryOpen[0] ? "Hide currencies" : "Choose a currency",
-                            countryOpen[0] ? "⌃" : "⌄");
+                            openCountry[0] == asset ? "Hide currencies" : "Choose a currency",
+                            openCountry[0] == asset ? "⌃" : "⌄");
                 }
                 return assetRow(asset, asset.code.equals(chosen.code), false);
             }
@@ -169,12 +169,12 @@ public class MainActivity extends Activity {
             boolean palestineExactMatch = Arrays.asList("palestine", "palestinian territories", "ps", "pse").contains(query);
             boolean palestineMatch = world && (query.isEmpty() || palestineExactMatch
                     || (query.length() >= 3 && "palestine".startsWith(query)));
-            boolean palauMatch = world && ("pala".equals(query) || "palau".equals(query)
+            boolean palauMatch = world && ((!query.isEmpty() && "palau".startsWith(query))
                     || "pw".equals(query) || "plw".equals(query));
-            Asset countryOption = palauMatch ? PALAU_OPTION : palestineMatch ? PALESTINE_OPTION : null;
-            Set<String> countries = world ? countrySearch.currencies(query, palestineMatch ? "PS" : null)
-                    : Collections.emptySet();
-            if (!palauMatch && !(palestineMatch && (palestineExactMatch || countryOpen[0]))) {
+            boolean palauOnly = palauMatch && !Arrays.asList("p", "pa", "pal").contains(query);
+            Set<String> countries = world ? countrySearch.currencies(query,
+                    palestineMatch ? "PS" : null, palauMatch ? "PW" : null) : Collections.emptySet();
+            if (openCountry[0] == null && !palauOnly && !(world && palestineExactMatch)) {
                 for (Asset asset : groups.get(category[0])) {
                     if (countries.contains(asset.code) || matchesAssetSearch(asset, query)) visible.add(asset);
                 }
@@ -182,24 +182,28 @@ public class MainActivity extends Activity {
                         left.code.equalsIgnoreCase(query) ? 0 : countries.contains(left.code) ? 1 : 2,
                         right.code.equalsIgnoreCase(query) ? 0 : countries.contains(right.code) ? 1 : 2));
             }
-            if (countryOption != null) {
-                int position = 0;
-                if (query.isEmpty()) {
-                    while (position < visible.size()
-                            && visible.get(position).name.compareToIgnoreCase(countryOption.name) < 0) position++;
+            if (openCountry[0] != null) {
+                Asset country = openCountry[0];
+                visible.add(country);
+                Set<String> options = countrySearch.currencies(country.code, null);
+                for (String code : Arrays.asList("USD", "ILS", "JOD")) {
+                    if (options.contains(code)) visible.add(find(code));
                 }
-                visible.add(position, countryOption);
-                if (countryOpen[0]) {
-                    Set<String> options = countrySearch.currencies(countryOption.code.toLowerCase(Locale.ROOT), null);
-                    for (String code : Arrays.asList("USD", "ILS", "JOD")) {
-                        if (options.contains(code)) visible.add(++position, find(code));
+            } else {
+                if (palestineMatch) {
+                    int position = 0;
+                    if (query.isEmpty()) {
+                        while (position < visible.size()
+                                && visible.get(position).name.compareToIgnoreCase(PALESTINE_OPTION.name) < 0) position++;
                     }
+                    visible.add(position, PALESTINE_OPTION);
                 }
+                if (palauMatch) visible.add(0, PALAU_OPTION);
             }
             adapter.notifyDataSetChanged();for(int i=0;i<3;i++){tabViews[i].setBackground(surface(i==category[0]?0xffdfe9ed:CREAM));tabViews[i].setSelected(i==category[0]);tabViews[i].setContentDescription(names[i]+(i==category[0]?", selected":""));}};
-        for(int i=0;i<3;i++){final int index=i;tabViews[i].setFocusable(true);tabViews[i].setOnClickListener(v->{category[0]=index;search.setText("");filter.run();if(pickerMotion!=null){pickerMotion.setSelected(index==0);if(index==0)pickerMotion.replay();}});}
+        for(int i=0;i<3;i++){final int index=i;tabViews[i].setFocusable(true);tabViews[i].setOnClickListener(v->{category[0]=index;openCountry[0]=null;search.setText("");filter.run();if(pickerMotion!=null){pickerMotion.setSelected(index==0);if(index==0)pickerMotion.replay();}});}
         search.addTextChangedListener(watcher(() -> {
-            countryOpen[0] = false;
+            openCountry[0] = null;
             filter.run();
         }));
         picker=new Dialog(this);picker.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -208,11 +212,11 @@ public class MainActivity extends Activity {
             Asset asset = visible.get(position);
             if (asset == PALESTINE_OPTION || asset == PALAU_OPTION) {
                 int top = view.getTop() - list.getPaddingTop();
-                countryOpen[0] = !countryOpen[0];
-                if (countryOpen[0]) ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+                openCountry[0] = openCountry[0] == asset ? null : asset;
+                if (openCountry[0] != null) ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
                         .hideSoftInputFromWindow(search.getWindowToken(), 0);
                 filter.run();
-                list.setSelectionFromTop(visible.indexOf(asset), countryOpen[0] ? 0 : top);
+                list.setSelectionFromTop(visible.indexOf(asset), openCountry[0] != null ? 0 : top);
                 return;
             }
             if (source) from = asset; else to = asset;
