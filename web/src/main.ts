@@ -4,6 +4,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { countryCurrencies, normalizeSearch } from './country-search';
 import { assets, Asset } from '../../shared/assets';
+import { decimal } from '../../shared/decimal';
 const palestineOption = 'palestine';
 type PickerOption = Asset | typeof palestineOption;
 const defaultWorldOptions: PickerOption[] = ([...assets.filter(asset => asset.kind === 'world'), palestineOption] as PickerOption[])
@@ -83,7 +84,7 @@ const searchAliases: Partial<Record<string, string>> = {
   </button>
   <button type="button" class="asset" (click)="openPicker('to')"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: asset(to)}"></ng-container><span><small>TO</small><strong>{{to}}</strong><span class="asset-name">{{asset(to).name}}</span></span><span class="chevron">⌄</span></button></div>
   <button class="convert" type="submit" [disabled]="loading()">{{loading() ? 'Getting reference rates…' : 'Convert'}}</button></form>
-  <div class="result" aria-live="polite">@if(error()){<p class="error" role="alert">{{error()}}</p>} @else if(result()){<small>{{result().amount}} {{resultUnit(result().from)}} equals</small><div class="value">{{result().result}} @if (asset(result().to).kind === 'metal') { {{resultUnit(result().to)}} } @else { <span>{{result().to}}</span> }</div>@for(q of result().quotes; track $index){<p class="quote">{{q.code}} · {{q.date}} · {{q.source}} {{q.cached ? '· cached' : ''}}</p>}} @else {<span class="result-placeholder">Your next perspective starts here.</span>}</div>
+  <div class="result" aria-live="polite">@if(error()){<p class="error" role="alert">{{error()}}</p>} @else if(result()){<small>{{result().amount}} {{resultUnit(result().from)}} equals</small><div class="value">{{resultValue(result())}} @if (asset(result().to).kind === 'metal') { {{resultUnit(result().to)}} } @else { <span>{{result().to}}</span> }</div>@for(q of result().quotes; track $index){<p class="quote">{{q.code}} · {{q.date}} · {{q.source}} {{q.cached ? '· cached' : ''}}</p>}} @else {<span class="result-placeholder">Your next perspective starts here.</span>}</div>
   <p class="note">Dated reference values, not live trading quotes. Metal units are troy ounces. Rates may have different effective dates; provider coverage varies.</p></section>
   <div class="features"><div><span>01</span><strong>Across borders</strong><p>World currencies in one searchable collection.</p></div><div><span>02</span><strong>Beyond currencies</strong><p>Gold, silver, platinum and palladium.</p></div><div><span>03</span><strong>Into digital</strong><p>Crypto and smaller denominations.</p></div></div>
   </main><footer>
@@ -125,6 +126,15 @@ class App {
     return 'icons/' + coin.toLowerCase() + '.png';
   }
   asset(code:string):Asset {return assets.find(a=>a.code===code)!;}
+  resultValue(conversion: { amount: string; to: string; result: string; quotes: { rate: string }[] }): string {
+    if (this.asset(conversion.to).kind !== 'world') return conversion.result;
+    const [amount, amountScale] = decimal(conversion.amount);
+    const [fromRate, fromScale] = decimal(conversion.quotes[0].rate);
+    const [toRate, toScale] = decimal(conversion.quotes[1].rate);
+    // Compare the exact amount × target rate / source rate with 0.01 before rounding.
+    const belowCent = amount > 0n && 100n * amount * toRate * fromScale < amountScale * toScale * fromRate;
+    return belowCent ? '< 0.01' : conversion.result;
+  }
   resultUnit(code: string): string {
     const asset = this.asset(code);
     return asset.kind === 'metal' ? `troy oz of ${asset.name}` : code;
