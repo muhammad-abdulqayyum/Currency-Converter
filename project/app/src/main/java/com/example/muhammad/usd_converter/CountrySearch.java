@@ -40,11 +40,15 @@ final class CountrySearch {
     }
 
     Set<String> currencies(String query, String excludedCountry) {
+        return currencies(query, excludedCountry, null);
+    }
+
+    Set<String> currencies(String query, String excludedCountry, String secondExcludedCountry) {
         Set<String> matches = new HashSet<>();
         if (query.isEmpty()) return matches;
         for (Iterator<String> keys = countries.keys(); keys.hasNext();) {
             String code = keys.next();
-            if (code.equals(excludedCountry)) continue;
+            if (code.equals(excludedCountry) || code.equals(secondExcludedCountry)) continue;
             JSONObject country = countries.optJSONObject(code);
             if (country == null) continue;
             boolean exact = code.equalsIgnoreCase(query) || country.optString("alpha3").equalsIgnoreCase(query);
