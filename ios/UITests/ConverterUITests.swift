@@ -56,6 +56,39 @@ final class ConverterUITests: XCTestCase {
         let targetSearch = app.searchFields.firstMatch; targetSearch.tap(); targetSearch.typeText("PHP"); tap("asset_PHP")
         convert("1,200.00 PHP")
     }
+    func testCountryPickerGroups() {
+        tap("toAsset")
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("p")
+        let palau = app.descendants(matching: .any).matching(identifier: "asset_PW").firstMatch
+        XCTAssertTrue(palau.waitForExistence(timeout: 5))
+        search.typeText("al")
+        let palestine = app.descendants(matching: .any).matching(identifier: "asset_PS").firstMatch
+        XCTAssertTrue(palestine.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "asset_USD").firstMatch.exists)
+        tap("asset_PW")
+        XCTAssertFalse(palestine.exists)
+        let usd = app.descendants(matching: .any).matching(identifier: "asset_USD").firstMatch
+        XCTAssertTrue(usd.waitForExistence(timeout: 5))
+        capturePicker("Palau currency options")
+        tap("asset_PW")
+        tap("asset_PS")
+        XCTAssertFalse(palau.exists)
+        for code in ["USD", "ILS", "JOD"] {
+            XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "asset_" + code).firstMatch.waitForExistence(timeout: 5))
+        }
+        capturePicker("Palestine currency options")
+        tap("asset_JOD")
+        XCTAssertTrue(app.buttons["toAsset"].label.contains("Jordanian Dinar"))
+    }
+    private func capturePicker(_ name: String) {
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = name
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+    }
     func testLayoutAndFooter() {
         let from = app.buttons["fromAsset"].frame, to = app.buttons["toAsset"].frame, swap = app.buttons["swap"].frame
         XCTAssertGreaterThanOrEqual(swap.width, 44); XCTAssertGreaterThanOrEqual(swap.height, 44)

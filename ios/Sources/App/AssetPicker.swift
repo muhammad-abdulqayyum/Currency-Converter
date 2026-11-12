@@ -64,22 +64,29 @@ struct AssetPicker: View {
         self.assets = assets; self.chosen = chosen; self.source = source; self.select = select
         _category = State(initialValue: chosen.category)
     }
-    @State private var palestineOpen = false
-    private var palestineMatch: Bool {
-        let query = CountrySearch.normalize(search)
-        return category == .world && (palestineExactMatch(query) || (query.count >= 3 && "palestine".hasPrefix(query)))
-    }
-    private func palestineExactMatch(_ query: String) -> Bool {
-        ["palestine", "palestinian territories", "ps", "pse"].contains(query)
-    }
+    @State private var openCountry: Asset?
+    private static let palestine = Asset("PS", "Palestine", "🇵🇸", .world)
+    private static let palau = Asset("PW", "Palau", "🇵🇼", .world)
+
     private var matches: [Asset] {
-        if palestineMatch && palestineOpen {
-            let currencies = CountrySearch.currencies(for: "ps")
-            return assets.filter { currencies.contains($0.code) }
+        if let country = openCountry {
+            let currencies = CountrySearch.currencies(for: country.code.lowercased())
+            let options = ["USD", "ILS", "JOD"].compactMap { code in
+                currencies.contains(code) ? assets.first { $0.code == code } : nil
+            }
+            return [country] + options
         }
         let query = CountrySearch.normalize(search)
-        if palestineMatch && palestineExactMatch(query) { return [] }
-        let countries = category == .world ? CountrySearch.currencies(for: query, excluding: palestineMatch ? "PS" : nil) : []
+        let world = category == .world
+        let palestineExact = ["palestine", "palestinian territories", "ps", "pse"].contains(query)
+        let palestineMatch = world && (query.isEmpty || palestineExact || (query.count >= 3 && "palestine".hasPrefix(query)))
+        let palauMatch = world && ((!query.isEmpty && "palau".hasPrefix(query)) || ["pw", "plw"].contains(query))
+        if world && palestineExact { return [Self.palestine] }
+        if palauMatch && !["p", "pa", "pal"].contains(query) { return [Self.palau] }
+        var excludedCountries: Set<String> = []
+        if palestineMatch { excludedCountries.insert(Self.palestine.code) }
+        if palauMatch { excludedCountries.insert(Self.palau.code) }
+        let countries = world ? CountrySearch.currencies(for: query, excluding: excludedCountries) : []
         let results = assets.filter { asset in
             guard asset.category == category else { return false }
             return query.isEmpty
@@ -94,7 +101,13 @@ struct AssetPicker: View {
                 || (asset.code == "BCH" && "bitcoin cash coins".contains(query))
                 || (asset.code == "SAT" && "satoshis".contains(query))
         }
-        return results.filter { $0.code.lowercased() == query }
+        if world && query.isEmpty {
+            return (results + [Self.palestine]).sorted {
+                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
+        }
+        let countryRows = (palauMatch ? [Self.palau] : []) + (palestineMatch ? [Self.palestine] : [])
+        return countryRows + results.filter { $0.code.lowercased() == query }
             + results.filter { $0.code.lowercased() != query && countries.contains($0.code) }
             + results.filter { $0.code.lowercased() != query && !countries.contains($0.code) }
     }
@@ -103,7 +116,7 @@ struct AssetPicker: View {
             VStack(spacing: 12) {
                 HStack(spacing: 8) {
                     ForEach(Category.allCases) { item in
-                        Button { category = item; search = "" } label: {
+                        Button { openCountry = nil; category = item; search = "" } label: {
                             VStack(spacing: 5) {
                                 Group {
                                     if item == .world { Text("🌎").font(.system(size: 30)) }
@@ -117,33 +130,41 @@ struct AssetPicker: View {
                             .accessibilityAddTraits(category == item ? [.isSelected] : [])
                     }
                 }.padding(.horizontal, 16)
-                if palestineMatch {
-                    Button { palestineOpen.toggle() } label: {
-                        Label("🇵🇸 Palestine · Choose a currency", systemImage: palestineOpen ? "chevron.up" : "chevron.down")
-                    }.padding(.vertical, 8)
-                }
-                if matches.isEmpty && !palestineMatch { Text("No matches in this category.").foregroundColor(Theme.muted).padding(); Spacer() }
+                if matches.isEmpty { Text("No matches in this category.").foregroundColor(Theme.muted).padding(); Spacer() }
                 else {
                     List(matches) { asset in
-                        Button { select(asset); dismiss() } label: {
+                        let isCountry = asset == Self.palestine || asset == Self.palau
+                        let subtitle = isCountry ? (openCountry == asset ? "Hide currencies" : "Choose a currency") : asset.subtitle
+                        Button {
+                            if isCountry {
+                                openCountry = openCountry == asset ? nil : asset
+                            } else {
+                                select(asset)
+                                dismiss()
+                            }
+                        } label: {
                             HStack(spacing: 12) {
                                 AssetIcon(asset: asset).frame(width: 40, height: 40).accessibilityHidden(true)
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(asset.name).font(.system(.headline, design: .serif)).foregroundColor(Theme.navy)
-                                    Text(asset.subtitle).font(.footnote).foregroundColor(Theme.muted)
+                                    Text(subtitle).font(.footnote).foregroundColor(Theme.muted)
                                 }
                                 Spacer()
-                                if asset == chosen { Image(systemName: "checkmark").foregroundColor(Theme.green) }
+                                if isCountry {
+                                    Image(systemName: openCountry == asset ? "chevron.up" : "chevron.down").foregroundColor(Theme.green)
+                                } else if asset == chosen {
+                                    Image(systemName: "checkmark").foregroundColor(Theme.green)
+                                }
                             }.padding(.vertical, 5)
-                        }.accessibilityIdentifier("asset_" + asset.code).accessibilityLabel(asset.name + ", " + asset.subtitle)
+                        }.accessibilityIdentifier("asset_" + asset.code).accessibilityLabel(asset.name + ", " + subtitle)
                             .accessibilityAddTraits(asset == chosen ? [.isSelected] : [])
                     }.listStyle(.plain)
                 }
             }.padding(.top, 8).background(Theme.cream)
                 .navigationTitle(source ? "Convert from" : "Convert to").navigationBarTitleDisplayMode(.inline)
                 .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search name or code")
-                .onChange(of: search) { _ in palestineOpen = false }
-                .onChange(of: category) { _ in palestineOpen = false }
+                .onChange(of: search) { _ in openCountry = nil }
+                .onChange(of: category) { _ in openCountry = nil }
                 .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Done") { dismiss() }.foregroundColor(Theme.green) } }
         }.navigationViewStyle(.stack)
     }

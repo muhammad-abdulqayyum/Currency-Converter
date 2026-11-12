@@ -42,6 +42,17 @@ for label,device in matrix:
  xcode(*checks,'-destination','id='+udid,'-parallel-testing-enabled','NO','-test-timeouts-enabled','YES',
        '-default-test-execution-time-allowance','120','-maximum-test-execution-time-allowance','180',
        '-resultBundlePath',str(OUT/(label+'.xcresult')),'test-without-building',log=label+'-tests.log',timeout=480)
+ if label == 'phone':
+  attachments=OUT/'attachments'
+  subprocess.run(['xcrun','xcresulttool','export','attachments','--path',str(OUT/'phone.xcresult'),
+                  '--output-path',str(attachments)],check=True)
+  previews={'Palau currency options':'palau-picker.png','Palestine currency options':'palestine-picker.png'}
+  for test in json.loads((attachments/'manifest.json').read_text()):
+   for attachment in test.get('attachments',[]):
+    name=attachment.get('suggestedHumanReadableName','')
+    for title,filename in previews.items():
+     if name.startswith(title):
+      (OUT/filename).write_bytes((attachments/attachment['exportedFileName']).read_bytes())
  # A clean initial screen has no synthetic conversion prices in its screenshot.
  app=OUT/'simulator/Build/Products/Debug-iphonesimulator/UniversalCurrencyConverter.app'
  subprocess.run(['xcrun','simctl','install',udid,str(app)],check=True)
