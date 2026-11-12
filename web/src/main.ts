@@ -4,7 +4,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { countryCurrencies, normalizeSearch } from './country-search';
 import { assets, Asset } from '../../shared/assets';
-import { decimal } from '../../shared/decimal';
+import { displayConversionResult } from '../../shared/display-precision';
 const palestineOption = 'palestine';
 type PickerOption = Asset | typeof palestineOption;
 const defaultWorldOptions: PickerOption[] = ([...assets.filter(asset => asset.kind === 'world'), palestineOption] as PickerOption[])
@@ -127,13 +127,7 @@ class App {
   }
   asset(code:string):Asset {return assets.find(a=>a.code===code)!;}
   resultValue(conversion: { amount: string; to: string; result: string; quotes: { rate: string }[] }): string {
-    if (this.asset(conversion.to).kind !== 'world') return conversion.result;
-    const [amount, amountScale] = decimal(conversion.amount);
-    const [fromRate, fromScale] = decimal(conversion.quotes[0].rate);
-    const [toRate, toScale] = decimal(conversion.quotes[1].rate);
-    // Compare the exact amount × target rate / source rate with 0.01 before rounding.
-    const belowCent = amount > 0n && 100n * amount * toRate * fromScale < amountScale * toScale * fromRate;
-    return belowCent ? '< 0.01' : conversion.result;
+    return displayConversionResult(conversion, this.asset(conversion.to));
   }
   resultUnit(code: string): string {
     const asset = this.asset(code);
