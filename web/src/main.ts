@@ -4,15 +4,12 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { countryCurrencies, normalizeSearch } from './country-search';
 import { assets, Asset } from '../../shared/assets';
-const palestineOption = 'palestine';
-type PickerOption = Asset | typeof palestineOption;
-const defaultWorldOptions: PickerOption[] = ([...assets.filter(asset => asset.kind === 'world'), palestineOption] as PickerOption[])
-  .sort((left, right) => {
-    const leftName = left === palestineOption ? 'Palestine' : left.name;
-    const rightName = right === palestineOption ? 'Palestine' : right.name;
-    return leftName.localeCompare(rightName, 'en');
-  });
-const palestineCurrencyCodes = countryCurrencies('ps');
+type CountryOption = { code: string; name: string; flag: string };
+type PickerOption = Asset | CountryOption;
+const palestineOption: CountryOption = { code: 'PS', name: 'Palestine', flag: 'flags/ps.svg' };
+const palauOption: CountryOption = { code: 'PW', name: 'Palau', flag: 'flags/pw.svg' };
+const defaultWorldOptions: PickerOption[] = [...assets.filter(asset => asset.kind === 'world'), palestineOption];
+defaultWorldOptions.sort((left, right) => left.name.localeCompare(right.name, 'en'));
 const searchAliases: Partial<Record<string, string>> = {
   USD: 'US Dollar',
   EUR: 'Europe',
@@ -61,17 +58,12 @@ const searchAliases: Partial<Record<string, string>> = {
   <ng-template #assetOption let-a>
     <button type="button" class="asset" (click)="select(a.code)"><ng-container [ngTemplateOutlet]="assetIcon" [ngTemplateOutletContext]="{$implicit: a}"></ng-container><span><strong>{{a.code}}</strong><span class="asset-name">{{a.name}}{{a.kind === 'metal' ? ' · troy oz' : ''}}</span></span><span class="chevron">↗</span></button>
   </ng-template>
-  <ng-template #palestineGroup>
-    <button type="button" class="asset" (click)="palestineOpen = !palestineOpen" [attr.aria-expanded]="palestineOpen">
-      <span class="asset-icon" aria-hidden="true"><img class="world-flag" src="flags/ps.svg" alt=""></span>
-      <span><strong>Palestine</strong><span class="asset-name">Choose a currency</span></span>
-      <span class="chevron">{{palestineOpen ? '⌃' : '⌄'}}</span>
+  <ng-template #countryGroup let-country>
+    <button type="button" class="asset" (click)="toggleCountry(country)" [attr.aria-expanded]="openCountry === country">
+      <span class="asset-icon" aria-hidden="true"><img class="world-flag" [src]="country.flag" alt=""></span>
+      <span><strong>{{country.name}}</strong><span class="asset-name">{{openCountry === country ? 'Hide currencies' : 'Choose a currency'}}</span></span>
+      <span class="chevron">{{openCountry === country ? '⌃' : '⌄'}}</span>
     </button>
-    @if (palestineOpen) {
-      @for (a of palestineCurrencies; track a.code) {
-        <ng-container [ngTemplateOutlet]="assetOption" [ngTemplateOutletContext]="{$implicit: a}"></ng-container>
-      }
-    }
   </ng-template>
   <header><a href="/" class="brand"><span class="logo">◎</span><span>UNIVERSAL<small>CURRENCY CONVERTER</small></span></a><span class="web-label">WORLD · METALS · CRYPTO</span></header>
   <main><div class="intro"><span class="eyebrow">A WORLD OF VALUE, CONNECTED</span><h1>Different currencies.<br><em>One clear conversion.</em></h1><p>Explore world currencies, precious metals and cryptocurrency in one place.</p></div>
@@ -95,10 +87,10 @@ const searchAliases: Partial<Record<string, string>> = {
       <a href="https://github.com/muhammad-abdulqayyum/Currency-Converter">Source code</a></div>
     </div>
   </footer>
-  @if(picking()) {<div class="overlay" (click)="closePicker()"><section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" (click)="$event.stopPropagation()" (keydown.escape)="closePicker()"><div class="card-top"><h2 id="picker-title">Choose an asset</h2><button type="button" class="close" aria-label="Close asset picker" (click)="closePicker()">×</button></div><input class="search" aria-label="Search assets" placeholder="Search name or code…" [(ngModel)]="search" (ngModelChange)="palestineOpen = false"><div class="tabs">@for(k of kinds;track k){<button type="button" [class.active]="kind === k" (click)="kind=k; palestineOpen=false"><img class="category-icon" [src]="k === 'world' ? 'icons/category_world.png' : k === 'metal' ? 'icons/category_metals.png' : 'icons/category_crypto.png'" width="20" height="20" alt="">{{k === 'world' ? 'World' : k === 'metal' ? 'Metals' : 'Crypto'}}</button>}</div><div class="asset-list">
-    @for (option of pickerOptions(); track option === 'palestine' ? option : option.code) {
-      @if (option === 'palestine') {
-        <ng-container [ngTemplateOutlet]="palestineGroup"></ng-container>
+  @if(picking()) {<div class="overlay" (click)="closePicker()"><section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" (click)="$event.stopPropagation()" (keydown.escape)="closePicker()"><div class="card-top"><h2 id="picker-title">Choose an asset</h2><button type="button" class="close" aria-label="Close asset picker" (click)="closePicker()">×</button></div><input class="search" aria-label="Search assets" placeholder="Search name or code…" [(ngModel)]="search" (ngModelChange)="openCountry = null"><div class="tabs">@for(k of kinds;track k){<button type="button" [class.active]="kind === k" (click)="kind=k; openCountry=null"><img class="category-icon" [src]="k === 'world' ? 'icons/category_world.png' : k === 'metal' ? 'icons/category_metals.png' : 'icons/category_crypto.png'" width="20" height="20" alt="">{{k === 'world' ? 'World' : k === 'metal' ? 'Metals' : 'Crypto'}}</button>}</div><div class="asset-list">
+    @for (option of pickerOptions(); track option.code) {
+      @if ('flag' in option) {
+        <ng-container [ngTemplateOutlet]="countryGroup" [ngTemplateOutletContext]="{$implicit: option}"></ng-container>
       } @else {
         <ng-container [ngTemplateOutlet]="assetOption" [ngTemplateOutletContext]="{$implicit: option}"></ng-container>
       }
@@ -129,25 +121,29 @@ class App {
     const asset = this.asset(code);
     return asset.kind === 'metal' ? `troy oz of ${asset.name}` : code;
   }
-  palestineOpen = false;
-  readonly palestineCurrencies = assets.filter(asset => palestineCurrencyCodes.has(asset.code));
-  private palestineMatch(query: string) {
-    return this.kind === 'world' && (this.palestineExactMatch(query) ||
-      (query.length >= 3 && 'palestine'.startsWith(query)));
-  }
-  private palestineExactMatch(query: string) {
-    return ['palestine', 'palestinian territories', 'ps', 'pse'].includes(query);
+  openCountry: CountryOption | null = null;
+  toggleCountry(country: CountryOption) {
+    this.openCountry = this.openCountry === country ? null : country;
   }
   pickerOptions(): PickerOption[] {
+    if (this.openCountry) {
+      const codes = countryCurrencies(this.openCountry.code.toLowerCase());
+      return [this.openCountry, ...assets.filter(asset => codes.has(asset.code))];
+    }
     const query = normalizeSearch(this.search);
-    if (this.kind === 'world' && !query) return defaultWorldOptions;
-    const palestineMatch = this.palestineMatch(query);
-    if (palestineMatch && (this.palestineOpen || this.palestineExactMatch(query))) return [palestineOption];
-    const matches = this.filteredAssets(query, palestineMatch);
-    return palestineMatch ? [palestineOption, ...matches] : matches;
+    const world = this.kind === 'world';
+    if (world && !query) return defaultWorldOptions;
+    const palestineExact = world && ['palestine', 'palestinian territories', 'ps', 'pse'].includes(query);
+    const palestineMatch = palestineExact || (world && query.length >= 3 && 'palestine'.startsWith(query));
+    const palauMatch = world && ((query && 'palau'.startsWith(query)) || ['pw', 'plw'].includes(query));
+    if (palestineExact) return [palestineOption];
+    if (palauMatch && !['p', 'pa', 'pal'].includes(query)) return [palauOption];
+    const countries = world ? countryCurrencies(query, palestineMatch ? 'PS' : undefined, palauMatch ? 'PW' : undefined)
+      : new Set<string>();
+    return [...(palauMatch ? [palauOption] : []), ...(palestineMatch ? [palestineOption] : []),
+      ...this.filteredAssets(query, countries)];
   }
-  private filteredAssets(query: string, palestineMatch: boolean) {
-    const countries = this.kind === 'world' ? countryCurrencies(query, palestineMatch ? 'PS' : undefined) : new Set<string>();
+  private filteredAssets(query: string, countries: Set<string>) {
     const rank = (code: string) => code.toLowerCase() === query ? 0 : countries.has(code) ? 1 : 2;
     return assets.filter(asset => asset.kind === this.kind &&
       (countries.has(asset.code) || normalizeSearch(`${asset.code} ${asset.name}`).includes(query) ||
@@ -156,7 +152,7 @@ class App {
   }
   invalidate(){this.version++;this.result.set(null);this.error.set('');this.loading.set(false);}
   openPicker(side:'from'|'to'){this.picking.set(side);this.kind=this.asset(this[side]).kind;this.search='';setTimeout(()=>document.querySelector<HTMLInputElement>('.search')?.focus());}
-  closePicker(){this.palestineOpen=false;this.picking.set('');}
+  closePicker(){this.openCountry=null;this.picking.set('');}
   select(code:string){const side=this.picking();if(side)this[side]=code;this.closePicker();this.invalidate();}
   swap(){[this.from,this.to]=[this.to,this.from];this.invalidate();}
   async calculate(){const version=++this.version;this.loading.set(true);this.error.set('');this.result.set(null);try{const response=await fetch('/api/convert?'+new URLSearchParams({amount:this.amount,from:this.from,to:this.to}),{signal:AbortSignal.timeout(25000)});const body=await response.json();if(!response.ok)throw new Error(body.error || 'Conversion unavailable');if(version===this.version)this.result.set(body);}catch(error){if(version===this.version)this.error.set(error instanceof Error?error.message:'Unable to connect. Please try again.');}finally{if(version===this.version)this.loading.set(false);}}
