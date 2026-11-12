@@ -22,3 +22,18 @@ test('upstream failure, stale data and wrong pairs never become prices',async()=
  globalThis.fetch=async()=>{throw new Error('offline')};assert.equal((await call('/api/convert')).status,503);
  }finally{globalThis.fetch=original;}
 });
+
+test('API uses destination currency precision for BHD and IRR',async()=>{
+ const original=globalThis.fetch;
+ globalThis.fetch=async(input)=>{
+  const code=new URL(String(input)).pathname.split('/').pop();
+  const rate=code==='BHD'?0.377:2000000;
+  return Response.json({base:'USD',quote:code,rate,date:new Date().toISOString().slice(0,10),providers:[{key:'ECB'}]});
+ };
+ try {
+  const bhd=await (await call('/api/convert?from=USD&to=BHD&amount=1')).json();
+  assert.equal(bhd.result,'0.377');
+  const irr=await (await call('/api/convert?from=USD&to=IRR&amount=0.000000625')).json();
+  assert.equal(irr.result,'1');
+ } finally { globalThis.fetch=original; }
+});
