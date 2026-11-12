@@ -1,5 +1,6 @@
 import { assets } from '../shared/assets.ts';
 import { convert, decimal } from '../shared/decimal.ts';
+import { displayPlaces } from '../shared/display-precision.ts';
 interface Env { ASSETS: { fetch(request: Request): Promise<Response> } }
 interface Quote { code: string; rate: string; date: string; source: string; fetchedAt: string; cached?: boolean }
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
@@ -53,7 +54,7 @@ export default {
     try {
       const quotes = await Promise.all([quote(from, request), quote(to, request)]);
       const target = assets.find(a => a.code === to)!;
-      const places = target.kind === 'world' ? (['JPY','KRW','CLP','ISK'].includes(to) ? 0 : ['BHD','KWD','OMR','JOD','TND'].includes(to) ? 3 : 2) : to === 'SAT' || to === 'DROP' ? 0 : 8;
+      const places = displayPlaces(target);
       return json({ amount, from, to, result: convert(amount, quotes[0].rate, quotes[1].rate, places), quotes, referenceOnly: true });
     } catch (error) {
       console.error('Conversion failed', { from, to, error: String(error) });
