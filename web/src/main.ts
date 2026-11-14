@@ -84,7 +84,8 @@ const searchAliases: Partial<Record<string, string>> = {
       <img class="heritage-flag" src="icons/heritage_flag.png" width="28" height="19" alt="Black American Heritage Flag"></div>
       <div>
       <a href="https://www.linkedin.com/in/mabdulqayyum">LinkedIn</a> ·
-      <a href="https://github.com/muhammad-abdulqayyum/Currency-Converter">Source code</a></div>
+      <a href="https://github.com/muhammad-abdulqayyum/Currency-Converter">GitHub</a> ·
+      <a href="https://www.tiktok.com/@hafiznyc">TikTok</a> · <span>© 2026</span></div>
     </div>
   </footer>
   @if(picking()) {<div class="overlay" (click)="closePicker()"><section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" (click)="$event.stopPropagation()" (keydown.escape)="closePicker()"><div class="card-top"><h2 id="picker-title">Choose an asset</h2><button type="button" class="close" aria-label="Close asset picker" (click)="closePicker()">×</button></div><input class="search" aria-label="Search assets" placeholder="Search name or code…" [(ngModel)]="search" (ngModelChange)="openCountry = null"><div class="tabs">@for(k of kinds;track k){<button type="button" [class.active]="kind === k" (click)="kind=k; openCountry=null"><img class="category-icon" [src]="k === 'world' ? 'icons/category_world.png' : k === 'metal' ? 'icons/category_metals.png' : 'icons/category_crypto.png'" width="20" height="20" alt="">{{k === 'world' ? 'World' : k === 'metal' ? 'Metals' : 'Crypto'}}</button>}</div><div class="asset-list">
