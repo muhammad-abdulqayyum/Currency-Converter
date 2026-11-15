@@ -31,6 +31,6 @@ The latest passing [iOS CI run](https://github.com/muhammad-abdulqayyum/Currency
 
 ## About
 
-Built by Muhammad Hafiz Abdul-Qayyum in Clinton Hill, Brooklyn, New York City, USA. The original project was uploaded in 2017.
+Built by Muhammad Hafiz Abdul-Qayyum from Clinton Hill, Brooklyn, New York City, USA. The original project was uploaded in 2017.
 
 For humanity. If Allah wills.
