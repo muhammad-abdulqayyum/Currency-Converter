@@ -32,6 +32,7 @@ final class ConverterUITests: XCTestCase {
         expectation(for: match, evaluatedWith: result); waitForExpectations(timeout: 10)
     }
     func testConversionFlow() {
+        executionTimeAllowance = 180 // This flow performs several picker and conversion steps on CI simulators.
         choose("fromAsset", "Metals", "XAU"); choose("toAsset", "World", "USD")
         convert("400,000.00 USD"); tap("swap"); convert("0.025 troy oz of Gold")
         XCTAssertEqual(app.textFields["amount"].value as? String, "100")
